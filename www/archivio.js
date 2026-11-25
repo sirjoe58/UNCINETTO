@@ -14,7 +14,7 @@ function nuovoId() { return Date.now().toString(36) + Math.random().toString(36)
 function ora() { return Date.now(); }
 
 const Archivio = {
-  dati: { progetti: [], mieiSchemi: [], progressi: {}, veloce: null, eliminati: {} },
+  dati: { progetti: [], mieiSchemi: [], progressi: {}, veloce: null, hub: null, eliminati: {} },
   imp: { modo: 'semplice', testo: 'normale', vibra: true, schermo: true },
   stato: '', ultimoSync: 0, _timer: null, _ascoltatori: [],
 
@@ -32,7 +32,7 @@ const Archivio = {
   _normalizza(d) {
     d = d || {};
     return { progetti: d.progetti || [], mieiSchemi: d.mieiSchemi || [], progressi: d.progressi || {},
-      veloce: d.veloce || null, eliminati: d.eliminati || {} };
+      veloce: d.veloce || null, hub: d.hub || null, eliminati: d.eliminati || {} };
   },
 
   salvaImp() { localStorage.setItem('sj-unc-imp', JSON.stringify(this.imp)); },
@@ -64,7 +64,9 @@ const Archivio = {
     for (const [k, v] of Object.entries(b.progressi)) if (!prog[k] || (v.agg || 0) > (prog[k].agg || 0)) prog[k] = v;
     let veloce = a.veloce;
     if (b.veloce && (!veloce || (b.veloce.agg || 0) > (veloce.agg || 0))) veloce = b.veloce;
-    return { progetti: lista(a.progetti, b.progetti), mieiSchemi: lista(a.mieiSchemi, b.mieiSchemi), progressi: prog, veloce, eliminati: elim };
+    let hub = a.hub;
+    if (b.hub && (!hub || (b.hub.agg || 0) > (hub.agg || 0))) hub = b.hub;
+    return { progetti: lista(a.progetti, b.progetti), mieiSchemi: lista(a.mieiSchemi, b.mieiSchemi), progressi: prog, veloce, hub, eliminati: elim };
   },
 
   async _leggiRemoto() {

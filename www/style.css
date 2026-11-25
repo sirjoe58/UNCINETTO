@@ -114,3 +114,16 @@ a.link{color:var(--primario-scuro)}
 .video{background:#fdecec;border-left:4px solid #e04848;padding:10px 12px;border-radius:8px;margin:10px 0;cursor:pointer}
 .lez p,.lez li{line-height:1.6}
 .lez svg{max-width:100%;height:auto}
+
+/* Uncinetto Hub */
+.hub-card{background:var(--carta);border:1px solid var(--bordo);border-radius:var(--raggio);padding:16px;display:flex;flex-direction:column;gap:8px}
+.hub-card:hover{box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.hub-card h4{margin:0;font-size:1.05em}
+.hub-cat{font-size:.75em;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--secondario)}
+.hub-griglia{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.cuore{background:none;border:0;font-size:1.4em;cursor:pointer;min-width:44px;min-height:44px;color:var(--tenue)}
+.cuore.on{color:var(--primario)}
+.pillole{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.pillole button{flex:none;border:1px solid var(--bordo);background:#fff;border-radius:20px;padding:8px 14px;font:inherit;font-size:.9em;font-weight:600;cursor:pointer;min-height:42px}
+.pillole button.attivo{background:var(--secondario);border-color:var(--secondario);color:#fff}
+.badge-p{background:var(--secondario);color:#fff}
