@@ -1,0 +1,37 @@
+{
+  "name": "sirjoe-uncinetto",
+  "productName": "SirJoe Uncinetto",
+  "version": "1.0.0",
+  "description": "Uncinetto: contatori, schemi per categorie, libreria punti, progetti, calcolatori, sincronizzazione NAS",
+  "author": "Sergio Mantovani",
+  "license": "UNLICENSED",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist:win": "electron-builder --win --publish never"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/assets": "^4.0.0",
+    "@capacitor/cli": "^8.6.2",
+    "@capacitor/core": "^8.6.2",
+    "electron": "^45.4.1",
+    "electron-builder": "^26.18.0"
+  },
+  "build": {
+    "appId": "it.sirjoe.uncinetto",
+    "productName": "SirJoe Uncinetto",
+    "directories": { "output": "dist" },
+    "files": ["electron/**", "www/**", "build/icon.png", "package.json"],
+    "icon": "build/icon.png",
+    "win": { "target": [ { "target": "nsis", "arch": ["x64"] }, { "target": "portable", "arch": ["x64"] } ] },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "SirJoe Uncinetto",
+      "artifactName": "SirJoeUncinetto-Setup-${version}.exe"
+    },
+    "portable": { "artifactName": "SirJoeUncinetto-Portatile-${version}.exe" }
+  }
+}

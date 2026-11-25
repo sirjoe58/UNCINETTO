@@ -1,0 +1,110 @@
+name: Build SirJoe Uncinetto
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  VER: 1.0.${{ github.run_number }}
+  TAG: v1.0.${{ github.run_number }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_REPO: ${{ github.repository }}
+
+jobs:
+  prepara:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Crea la Release
+        run: |
+          gh release create "$TAG" --title "SirJoe Uncinetto $VER" --target "${{ github.sha }}" --notes "SirJoe Uncinetto
+          - Windows: SirJoeUncinetto-Setup (con installazione) oppure SirJoeUncinetto-Portatile (senza installazione)
+          - Android: SirJoeUncinetto-Android.apk"
+
+  windows:
+    needs: prepara
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install
+      - name: Versione
+        shell: bash
+        run: npm pkg set version=$VER
+      - run: npx electron-builder --win --publish never
+      - name: Carica nella Release
+        shell: bash
+        run: gh release upload "$TAG" dist/*.exe --clobber
+
+  android:
+    needs: prepara
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - run: npm install
+      - name: Crea il progetto Android
+        run: |
+          npx cap add android
+          npx capacitor-assets generate --android || echo "icone: uso quelle predefinite"
+          D=android/app/src/main/java/it/sirjoe/uncinetto
+          mkdir -p $D
+          cp android-extra/*.java $D/
+          python3 - <<'PY'
+          import re
+          p = 'android/app/src/main/AndroidManifest.xml'
+          s = open(p).read()
+          perm = '''    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+              <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+              <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
+              <uses-permission android:name="android.permission.VIBRATE" />
+          '''
+          s = s.replace('<application', perm + '    <application', 1)
+          s = s.replace('<application', '<application android:requestLegacyExternalStorage="true"', 1)
+          open(p, 'w').write(s)
+          g = 'android/app/build.gradle'
+          t = open(g).read()
+          t = re.sub(r'versionCode \d+', 'versionCode ${{ github.run_number }}', t)
+          t = re.sub(r'versionName "[^"]*"', 'versionName "${{ env.VER }}"', t)
+          open(g, 'w').write(t)
+          PY
+          npx cap sync android
+      - name: Compila APK
+        run: cd android && chmod +x gradlew && ./gradlew assembleRelease --no-daemon
+      - name: Firma APK
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)
+          IN=android/app/build/outputs/apk/release/app-release-unsigned.apk
+          "$BT/zipalign" -f 4 "$IN" allineato.apk
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > ks.jks
+          else
+            echo "::warning::Chiave di firma mancante: uso una chiave di prova (gli aggiornamenti richiederanno di disinstallare l'app)"
+            KS_PASS=provaprova
+            keytool -genkeypair -keystore ks.jks -alias sirjoe -keyalg RSA -keysize 2048 -validity 10000 -storepass $KS_PASS -keypass $KS_PASS -dname "CN=SirJoe Prova"
+          fi
+          "$BT/apksigner" sign --ks ks.jks --ks-pass pass:$KS_PASS --key-pass pass:$KS_PASS --ks-key-alias sirjoe --out SirJoeUncinetto-Android.apk allineato.apk
+          rm ks.jks
+      - name: Carica nella Release
+        run: gh release upload "$TAG" SirJoeUncinetto-Android.apk --clobber
+
+  pulizia:
+    needs: [ windows, android ]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tieni solo le ultime 2 versioni
+        run: |
+          gh release list --limit 100 --json tagName,createdAt --jq 'sort_by(.createdAt) | reverse | .[2:] | .[].tagName' | while read t; do
+            [ -n "$t" ] && { echo "Cancello $t"; gh release delete "$t" --yes --cleanup-tag || true; }
+          done
