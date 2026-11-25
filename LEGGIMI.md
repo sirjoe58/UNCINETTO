@@ -9,6 +9,13 @@ link a siti di schemi gratuiti, sincronizzazione tramite NAS.
 Progettista di forme per amigurumi (sfera, ovale, cilindro, cono, goccia) e 10 modelli esclusivi
 (centrini, poncho, scaldamuscoli, borse, pupazzi, idee regalo).
 
+## Novità 1.2
+- **Da foto a schema**: carichi una foto e l'intelligenza artificiale Claude scrive lo schema giro per giro
+  (serve una chiave API di Anthropic, da inserire in Impostazioni; resta solo sul dispositivo).
+- **Esporta/Importa testo** nel formato "Giro 1: … (6)" per My Row Counter, Pocket Crochet e simili.
+- **Trova online**: schemi gratuiti da stampare per coperte, borse, sciarpe, cappellini e costumi da bagno,
+  con ricerche pronte su Pinterest, YouTube, Instagram, Facebook e TikTok.
+
 ## Scaricare
 Pagina **Releases** del repository:
 - `SirJoeUncinetto-Setup-x.y.z.exe` → Windows con installazione

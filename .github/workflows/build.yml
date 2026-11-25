@@ -9,8 +9,8 @@ permissions:
   contents: write
 
 env:
-  VER: 1.1.${{ github.run_number }}
-  TAG: v1.1.${{ github.run_number }}
+  VER: 1.2.${{ github.run_number }}
+  TAG: v1.2.${{ github.run_number }}
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GH_REPO: ${{ github.repository }}
 

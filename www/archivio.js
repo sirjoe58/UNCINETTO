@@ -129,9 +129,9 @@ const Piattaforma = {
   async salvaFile(nome, testo) {
     if (NATIVO) return NATIVO.salvaFile(nome, testo);
     if (SJ) { const a = await SJ.haAccesso(); if (!a.ok) { avviso('Dai prima il permesso alla cartella (Impostazioni).'); return; }
-      await SJ.scrivi({ nome, testo }); avviso('Salvato nella cartella SirJoeUncinetto del telefono'); return; }
+      await SJ.scrivi({ nome, testo }); avviso('Salvato in /SirJoeUncinetto/' + nome); return; }
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([testo], { type: 'application/json' }));
+    a.href = URL.createObjectURL(new Blob([testo], { type: nome.endsWith('.json') ? 'application/json' : 'text/plain;charset=utf-8' }));
     a.download = nome; a.click();
   },
 };
