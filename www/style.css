@@ -101,3 +101,16 @@ a.link{color:var(--primario-scuro)}
   #stampa svg,#stampa img{max-width:100%}
   #stampa .diagramma{border:0}
 }
+
+/* animazioni e scuola */
+.anim .didascalia{min-height:2.6em;font-weight:600;color:var(--primario-scuro);margin:8px 0 4px;font-size:1.02em}
+.anim .bottoni{justify-content:center}
+.anim svg .m{transition:opacity .25s}
+.anim svg .m.nascosto{opacity:0}
+.anim svg .m.ultimo{filter:drop-shadow(0 0 3px #f3c969)}
+.nuovo{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.75em;font-weight:700;background:#fff0c2;color:#8a6200;margin-left:4px}
+.lezione-num{width:40px;height:40px;border-radius:50%;background:var(--primario);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.lezione-num.fatta{background:var(--secondario)}
+.video{background:#fdecec;border-left:4px solid #e04848;padding:10px 12px;border-radius:8px;margin:10px 0;cursor:pointer}
+.lez p,.lez li{line-height:1.6}
+.lez svg{max-width:100%;height:auto}

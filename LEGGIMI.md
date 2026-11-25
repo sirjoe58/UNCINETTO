@@ -4,6 +4,11 @@ App per l'uncinetto: contatori di giri e maglie, schemi divisi per categorie con
 (semplici o per esperti), libreria dei punti, progetti con foto e note, editor di schemi a griglia, calcolatori,
 link a siti di schemi gratuiti, sincronizzazione tramite NAS.
 
+## Novità 1.1: Scuola di schemi
+10 lezioni con disegni e animazioni che costruiscono lo schema maglia dopo maglia, link ai video,
+Progettista di forme per amigurumi (sfera, ovale, cilindro, cono, goccia) e 10 modelli esclusivi
+(centrini, poncho, scaldamuscoli, borse, pupazzi, idee regalo).
+
 ## Scaricare
 Pagina **Releases** del repository:
 - `SirJoeUncinetto-Setup-x.y.z.exe` → Windows con installazione
