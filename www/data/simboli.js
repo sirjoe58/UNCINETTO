@@ -90,9 +90,9 @@ function diagrammaTondo(giri, opz) {
       const ang = (k / n) * 360 - 90;
       const rad = ang * Math.PI / 180;
       const x = Math.cos(rad) * r, y = Math.sin(rad) * r;
-      parti.push(`<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${ang + 90})">${simbolo(tipo, col)}</g>`);
+      parti.push(`<g class="m" data-g="${i}" transform="translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${ang + 90})">${simbolo(tipo, col)}</g>`);
     });
-    parti.push(`<text x="${(r + altezza * 0.5).toFixed(0)}" y="-4" font-size="10" fill="${col}" font-family="sans-serif">${i + 1}</text>`);
+    parti.push(`<text class="m" data-g="${i}" x="${(r + altezza * 0.5).toFixed(0)}" y="-4" font-size="10" fill="${col}" font-family="sans-serif">${i + 1}</text>`);
     raggio = r + altezza + 6;
   });
   const R = raggio + 10;
@@ -116,13 +116,13 @@ function diagrammaRighe(righe, opz) {
     const altezza = Math.max(...riga.map(t => (SIMBOLI[t] || { h: 14 }).h));
     riga.forEach((tipo, k) => {
       usati.add(tipo);
-      parti.push(`<g transform="translate(${k * dx},${y})">${simbolo(tipo, col)}</g>`);
+      parti.push(`<g class="m" data-g="${i}" transform="translate(${k * dx},${y})">${simbolo(tipo, col)}</g>`);
     });
     // freccia di direzione e numero riga
     // la riga 1 si lavora da destra a sinistra: il numero sta dove la riga comincia
     const daDestra = i % 2 === 0;
     const xt = daDestra ? larg * dx + 2 : -28;
-    parti.push(`<text x="${xt}" y="${y - altezza / 2 + 4}" font-size="11" fill="${col}" font-family="sans-serif">${daDestra ? (i + 1) + '←' : '→' + (i + 1)}</text>`);
+    parti.push(`<text class="m" data-g="${i}" x="${xt}" y="${y - altezza / 2 + 4}" font-size="11" fill="${col}" font-family="sans-serif">${daDestra ? (i + 1) + '←' : '→' + (i + 1)}</text>`);
     y -= altezza + 6;
   });
   const minX = -30, maxX = larg * dx + 30;
@@ -148,9 +148,9 @@ function diagrammaGranny(nGiri) {
       }
       // 2 catenelle d'angolo
       g2 += `<g transform="translate(${d - 6},${-d - 8}) rotate(25)">${simbolo('cat', col)}</g><g transform="translate(${d + 4},${-d + 2}) rotate(65)">${simbolo('cat', col)}</g>`;
-      parti.push(`<g transform="rotate(${lato * 90})">${g2}</g>`);
+      parti.push(`<g class="m" data-g="${g - 1}" transform="rotate(${lato * 90})">${g2}</g>`);
     }
-    parti.push(`<text x="${-d + 4}" y="${-d - 18}" font-size="11" fill="${col}" font-family="sans-serif">${g}</text>`);
+    parti.push(`<text class="m" data-g="${g - 1}" x="${-d + 4}" y="${-d - 18}" font-size="11" fill="${col}" font-family="sans-serif">${g}</text>`);
   }
   const R = P * nGiri + 30;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-R} ${-R} ${2 * R} ${2 * R}" width="${Math.min(2 * R, 420)}">${parti.join('')}</svg>`;

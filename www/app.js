@@ -28,7 +28,7 @@ const Nav = {
     const { vista, param } = this.attuale();
     Piattaforma.schermoAcceso(vista === 'contatore' || vista === 'progetto' ? Archivio.imp.schermo : false);
     $('#btnIndietro').hidden = this.pila.length <= 1;
-    const radiceMenu = { home: 'home', contatore: 'contatore', schemi: 'schemi', categoria: 'schemi', schema: 'schemi', progetti: 'progetti', progetto: 'progetti' }[vista] || 'altro';
+    const radiceMenu = { home: 'home', contatore: 'contatore', schemi: 'schemi', categoria: 'schemi', schema: 'schemi', progetti: 'progetti', progetto: 'progetti', scuola: 'home', lezione: 'home', forme: 'home' }[vista] || 'altro';
     $$('#menu button').forEach(b => b.classList.toggle('attivo', b.dataset.vai === radiceMenu && this.pila.length >= 1));
     const v = $('#vista'); v.scrollTop = 0;
     (VISTE[vista] || VISTE.home)(v, param);
@@ -121,7 +121,8 @@ const VISTE = {
       ${inCorso ? `<div class="riga" id="riprendi">${inCorso.foto ? `<img class="miniatura" src="${inCorso.foto}">` : '<span class="emoji">🧶</span>'}
         <div class="cresci"><b>Riprendi: ${esc(inCorso.nome)}</b><small>${inCorso.contatori.map(c => `${esc(c.nome)} ${c.valore}`).join(' · ')}</small></div><span>›</span></div><br>` : ''}
       <div class="griglia">
-        ${[['contatore', '➕', 'Contatore', 'Conta giri e maglie'], ['schemi', '🧶', 'Schemi', `${SCHEMI.length} schemi in ${CATEGORIE.length} categorie`],
+        ${[['scuola', '🎓', 'Scuola di schemi', `${LEZIONI.length} lezioni con animazioni`], ['forme', '🧸', 'Progettista di forme', 'Inventa un amigurumi'],
+           ['contatore', '➕', 'Contatore', 'Conta giri e maglie'], ['schemi', '🧶', 'Schemi', `${SCHEMI.length} schemi in ${CATEGORIE.length} categorie`],
            ['progetti', '📁', 'I miei progetti', `${D().progetti.length} progetti`], ['mieiSchemi', '✏️', 'Disegna schemi', 'Griglia a colori e simboli'],
            ['libreria', '📖', 'Libreria punti', `${PUNTI.length} punti spiegati`], ['calcolatori', '🧮', 'Calcolatori', 'Campione, filato, aumenti'],
            ['online', '🌐', 'Trova online', 'Siti di schemi gratuiti'], ['impostazioni', '⚙️', 'Impostazioni', 'NAS, testo, modalità']]
@@ -156,7 +157,7 @@ const VISTE = {
     const lista = SCHEMI.filter(s => s.cat === id).sort((a, b) => a.livello - b.livello);
     v.innerHTML = `<h2>${c.emoji} ${c.nome}</h2><div class="lista">${lista.map(s => {
       const pr = D().progressi[s.id]; const n = pr ? pr.fatti.length : 0;
-      return `<div class="riga" data-id="${s.id}"><span class="emoji">${s.emoji}</span><div class="cresci"><b>${esc(s.titolo)}</b>
+      return `<div class="riga" data-id="${s.id}"><span class="emoji">${s.emoji}</span><div class="cresci"><b>${esc(s.titolo)}</b>${s.nuovo ? '<span class="nuovo">✨ Esclusivo</span>' : ''}
         <small>${livelloHTML(s.livello)} ⏱ ${s.tempo} · 📏 ${s.misure}${n ? ` · ✔ ${n}/${s.passi.length} passi` : ''}</small></div><span>›</span></div>`;
     }).join('')}</div>`;
     $$('.riga', v).forEach(r => r.onclick = () => Nav.vai('schema', r.dataset.id));
@@ -215,7 +216,8 @@ const VISTE = {
     const p = D().progetti.find(x => x.id === id);
     if (!p) { Nav.indietro(); return; }
     titolo(p.nome);
-    const s = SCHEMI.find(x => x.id === p.schemaId);
+    const sOrig = SCHEMI.find(x => x.id === p.schemaId);
+    const s = sOrig || (p.passiPropri ? { titolo: p.nome, passi: p.passiPropri } : null);
     const mio = D().mieiSchemi.find(x => x.id === p.schemaId);
     const salva = () => { p.agg = ora(); Archivio.salva(); };
     const disegna = () => {
@@ -223,7 +225,7 @@ const VISTE = {
         ${p.foto ? `<img class="foto" src="${p.foto}">` : ''}
         <div id="cc"></div>
         ${s ? `<h3>Passi dello schema: ${esc(s.titolo)}</h3><div id="modo"></div>${passiHTML(s, p.fatti, p.id)}
-          <div class="bottoni"><button class="btn sec" id="apriSchema">Apri schema completo e diagramma</button></div>` : ''}
+          ${sOrig ? '<div class="bottoni"><button class="btn sec" id="apriSchema">Apri schema completo e diagramma</button></div>' : ''}` : ''}
         ${mio ? `<div class="bottoni"><button class="btn sec" id="apriMio">✏️ Apri il mio schema "${esc(mio.nome)}"</button></div>` : ''}
         <div class="scheda">
           <label>Nome</label><input id="pNome" value="${esc(p.nome)}">
@@ -244,7 +246,7 @@ const VISTE = {
       if (s) {
         $('#modo').replaceWith(selettoreModo(v, disegna));
         collegaPassi(v, () => p.fatti, f => { p.fatti = f; salva(); });
-        $('#apriSchema').onclick = () => Nav.vai('schema', s.id);
+        if (sOrig) $('#apriSchema').onclick = () => Nav.vai('schema', s.id);
       }
       if (mio) $('#apriMio').onclick = () => Nav.vai('editor', mio.id);
       $('#pNome').onchange = e => { p.nome = e.target.value || p.nome; titolo(p.nome); salva(); };
@@ -252,7 +254,7 @@ const VISTE = {
       $('#pUnc').onchange = e => { p.uncinetto = e.target.value; salva(); };
       $('#pFil').onchange = e => { p.filato = e.target.value; salva(); };
       $('#pNote').onchange = e => { p.note = e.target.value; salva(); };
-      $('#pSchema').onchange = e => { p.schemaId = e.target.value; p.fatti = []; salva(); VISTE.progetto(v, id); };
+      $('#pSchema').onchange = e => { p.schemaId = e.target.value; p.fatti = []; if (e.target.value) delete p.passiPropri; salva(); VISTE.progetto(v, id); };
       $('#pFoto').onchange = async e => { const f = e.target.files[0]; if (!f) return; p.foto = await riduciFoto(f); salva(); disegna(); };
       if (p.foto) $('#togliFoto').onclick = () => { p.foto = ''; salva(); disegna(); };
       $('#elimina').onclick = () => { if (confirm(`Eliminare il progetto "${p.nome}"?`)) { Archivio.elimina('progetti', p.id); Nav.indietro(); } };
@@ -262,7 +264,7 @@ const VISTE = {
 
   altro(v) {
     titolo('Altro');
-    v.innerHTML = `<div class="griglia">${[['mieiSchemi', '✏️', 'Disegna schemi'], ['libreria', '📖', 'Libreria punti'], ['calcolatori', '🧮', 'Calcolatori'],
+    v.innerHTML = `<div class="griglia">${[['scuola', '🎓', 'Scuola di schemi'], ['forme', '🧸', 'Progettista di forme'], ['mieiSchemi', '✏️', 'Disegna schemi'], ['libreria', '📖', 'Libreria punti'], ['calcolatori', '🧮', 'Calcolatori'],
       ['online', '🌐', 'Trova online'], ['impostazioni', '⚙️', 'Impostazioni'], ['guida', '❓', 'Guida all\'app']]
       .map(([id, e, t]) => `<button class="tessera" data-vai="${id}"><span class="emoji">${e}</span><b>${t}</b></button>`).join('')}</div>`;
     $$('.tessera', v).forEach(t => t.onclick = () => Nav.vai(t.dataset.vai));
@@ -346,7 +348,7 @@ const VISTE = {
         <p class="tenue piccolo">Salva un file con tutti i progetti e gli schemi, oppure recuperali da un file.</p>
         <div class="bottoni"><button class="btn sec" id="esporta">💾 Esporta copia</button><button class="btn sec" id="importaB">📂 Importa copia</button>
         <input type="file" id="importa" accept=".json,application/json" hidden></div></div>
-      <p class="tenue piccolo">SirJoe Uncinetto 1.0 · ${PIATTAFORMA}</p>`;
+      <p class="tenue piccolo">SirJoe Uncinetto 1.1 · ${PIATTAFORMA}</p>`;
     $('#iModo').value = imp.modo; $('#iTesto').value = imp.testo; $('#iVibra').checked = imp.vibra; $('#iSchermo').checked = imp.schermo;
     $('#iModo').onchange = e => { imp.modo = e.target.value; Archivio.salvaImp(); };
     $('#iTesto').onchange = e => { imp.testo = e.target.value; Archivio.salvaImp(); applicaTesto(); };
@@ -481,6 +483,133 @@ const CALCOLI = {
       <table class="tab"><tr><th>mm</th><th>US</th><th>Filato adatto</th></tr>${t.map(r => `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</table>`;
   },
 };
+
+
+/* ---------------- Animazioni ---------------- */
+function animazione(cont, dati) {
+  const { d, didascalie } = dati;
+  cont.innerHTML = `<div class="diagramma anim">${d.svg}<div class="didascalia">Premi ▶ per vedere come si costruisce, maglia dopo maglia.</div>
+    <div class="bottoni"><button class="btn" data-a="play">▶ Guarda</button><button class="btn sec" data-a="giro">⏭ Giro/riga successivo</button>
+    <button class="btn sec" data-a="tutto">Mostra tutto</button><select data-a="vel" style="width:auto"><option value="2">Lenta</option><option value="1" selected>Normale</option><option value="0.5">Veloce</option></select></div>
+    ${legendaHTML(d.usati)}</div>`;
+  const el = [...cont.querySelectorAll('svg .m')];
+  const tot = el.length;
+  let k = tot, timer = null, vel = 1;
+  const base = Math.max(25, Math.min(260, 16000 / Math.max(1, tot)));
+  const didEl = cont.querySelector('.didascalia');
+  const btnPlay = cont.querySelector('[data-a="play"]');
+  const mostra = n => {
+    k = n;
+    el.forEach((e, i) => { e.classList.toggle('nascosto', i >= n); e.classList.toggle('ultimo', i === n - 1 && n < tot); });
+    if (n === 0) { didEl.textContent = 'Si parte!'; return; }
+    const g = +el[Math.min(n, tot) - 1].dataset.g;
+    if (didascalie && didascalie[g]) didEl.textContent = didascalie[g];
+  };
+  const ferma = () => { clearInterval(timer); timer = null; btnPlay.textContent = k >= tot ? '↺ Rivedi' : '▶ Continua'; };
+  const avvia = () => {
+    if (k >= tot) mostra(0);
+    btnPlay.textContent = '⏸ Pausa';
+    timer = setInterval(() => { if (k >= tot) return ferma(); mostra(k + 1); }, base * vel);
+  };
+  btnPlay.onclick = () => timer ? ferma() : avvia();
+  cont.querySelector('[data-a="giro"]').onclick = () => {
+    ferma(); if (k >= tot) mostra(0);
+    const gAtt = k ? +el[k - 1].dataset.g : -1;
+    let n = k; while (n < tot && +el[n].dataset.g <= gAtt) n++;
+    const gNuovo = n < tot ? +el[n].dataset.g : gAtt;
+    while (n < tot && +el[n].dataset.g === gNuovo) n++;
+    mostra(n); ferma();
+  };
+  cont.querySelector('[data-a="tutto"]').onclick = () => { ferma(); mostra(tot); didEl.textContent = 'Schema completo.'; btnPlay.textContent = '↺ Rivedi'; };
+  cont.querySelector('[data-a="vel"]').onchange = e => { vel = +e.target.value; if (timer) { clearInterval(timer); timer = null; avvia(); } };
+  // ferma l'animazione se si cambia schermata
+  const osserva = setInterval(() => { if (!document.body.contains(cont)) { clearInterval(timer); clearInterval(osserva); } }, 1000);
+}
+
+function apriDestinazione(dest) {
+  if (dest.startsWith('categoria:')) return Nav.vai('categoria', dest.split(':')[1]);
+  Nav.vai(dest);
+}
+
+Object.assign(VISTE, {
+  scuola(v) {
+    titolo('Scuola di schemi');
+    const fatte = (D().progressi.__lezioni || { fatti: [] }).fatti;
+    v.innerHTML = `<h2>🎓 Impara a creare i tuoi schemi</h2>
+      <p class="tenue">Lezioni passo passo con disegni, animazioni che costruiscono lo schema maglia dopo maglia e link ai video. Alla fine trovi modelli esclusivi da provare.</p>
+      <div class="lista">${LEZIONI.map((l, i) => `<div class="riga" data-id="${l.id}"><div class="lezione-num ${fatte.includes(i) ? 'fatta' : ''}">${fatte.includes(i) ? '✓' : i + 1}</div>
+        <div class="cresci"><b>${l.emoji} ${esc(l.titolo)}</b><small>⏱ ${l.durata}</small></div><span>›</span></div>`).join('')}</div>
+      <h3>✨ Modelli esclusivi</h3><div class="lista">${SCHEMI.filter(s => s.nuovo).map(s => `<div class="riga" data-s="${s.id}"><span class="emoji">${s.emoji}</span>
+        <div class="cresci"><b>${esc(s.titolo)}</b><small>${livelloHTML(s.livello)} ${CATEGORIE.find(c => c.id === s.cat).nome}</small></div><span>›</span></div>`).join('')}</div>
+      <div class="bottoni"><button class="btn sec" id="forme">🧸 Progettista di forme</button><button class="btn sec" id="editor">✏️ Editor a griglia</button></div>`;
+    $$('.riga[data-id]', v).forEach(r => r.onclick = () => Nav.vai('lezione', r.dataset.id));
+    $$('.riga[data-s]', v).forEach(r => r.onclick = () => Nav.vai('schema', r.dataset.s));
+    $('#forme').onclick = () => Nav.vai('forme');
+    $('#editor').onclick = () => Nav.vai('mieiSchemi');
+  },
+
+  lezione(v, id) {
+    const i = LEZIONI.findIndex(l => l.id === id), l = LEZIONI[i];
+    titolo(l.titolo);
+    v.innerHTML = `<div class="lez"><h2>${l.emoji} Lezione ${i + 1}: ${esc(l.titolo)}</h2><div id="sez"></div>
+      <div class="bottoni" style="margin-top:20px"><button class="btn verde" id="fatta">✓ Lezione completata</button>
+      ${i + 1 < LEZIONI.length ? `<button class="btn" id="prossima">Lezione ${i + 2} ›</button>` : ''}</div></div>`;
+    const cont = $('#sez');
+    l.sez.forEach(s => {
+      const div = document.createElement('div');
+      if (s.t) div.innerHTML = s.t;
+      else if (s.svg) { div.className = 'diagramma'; div.style.margin = '10px 0'; div.innerHTML = s.svg(); }
+      else if (s.anim) { try { animazione(div, s.anim()); } catch (e) { console.warn(e); } }
+      else if (s.video) { div.className = 'video'; div.innerHTML = `🎬 <b>Guarda un video su YouTube</b><br><small class="tenue">Ricerca: "${esc(s.video)}" (si apre nel browser)</small>`;
+        div.onclick = () => Piattaforma.apriLink('https://www.youtube.com/results?search_query=' + encodeURIComponent(s.video)); }
+      else if (s.vai) { div.className = 'bottoni'; div.innerHTML = `<button class="btn sec">${s.vai[1]}</button>`; div.firstChild.onclick = () => apriDestinazione(s.vai[0]); }
+      cont.appendChild(div);
+    });
+    $('#fatta').onclick = () => {
+      const pr = D().progressi.__lezioni || { fatti: [] };
+      if (!pr.fatti.includes(i)) pr.fatti.push(i);
+      D().progressi.__lezioni = { agg: ora(), fatti: pr.fatti }; Archivio.salva(); avviso('Brava/o! Lezione completata 🎉');
+    };
+    if ($('#prossima')) $('#prossima').onclick = () => Nav.vai('lezione', LEZIONI[i + 1].id, true);
+  },
+
+  forme(v) {
+    titolo('Progettista di forme');
+    const st = Archivio.imp.forma || { tipo: 'sfera', max: 30, alt: 0 };
+    const disegna = () => {
+      const k = Math.round(st.max / 6);
+      const altDef = st.tipo === 'ovale' || st.tipo === 'cilindro' ? 2 * k : 0;
+      const alt = st.alt || altDef;
+      const pf = progettaForma(st.tipo, st.max, alt || undefined);
+      const cm = (st.max / Math.PI * 0.55).toFixed(1); // circa 0,55 cm per maglia bassa con cotone 3 mm
+      v.innerHTML = `<p class="tenue">Scegli la forma e la grandezza: l'app calcola tutti i giri e ti mostra la sagoma. Ogni maglia bassa con cotone 3 mm e uncinetto 2,5 mm misura circa mezzo centimetro.</p>
+        <div class="scheda"><label>Forma</label><div class="schede-tab">${Object.entries(FORME).map(([t, f]) => `<button data-t="${t}" class="${t === st.tipo ? 'attivo' : ''}">${f.emoji} ${f.nome}</button>`).join('')}</div>
+          <label>Maglie nel giro più largo: <b>${st.max}</b> (diametro circa ${cm} cm)</label><input type="range" id="fMax" min="12" max="72" step="6" value="${st.max}">
+          ${altDef ? `<label>Giri dritti (altezza): <b>${alt}</b></label><input type="range" id="fAlt" min="1" max="40" value="${alt}">` : ''}</div>
+        <div class="due"><div class="diagramma">${sagomaSVG(pf.giri)}<div class="tenue piccolo">Sagoma vista di lato · ${pf.giri.length} giri</div></div>
+          <div id="anFormA"></div></div>
+        <h3>Il tuo schema</h3><ol class="passi">${pf.passi.map((p, i) => `<li><span class="num">${i + 1}.</span><span>${esc(p)}</span></li>`).join('')}</ol>
+        <div class="bottoni"><button class="btn verde" id="crea">▶ Crea un progetto con questo schema</button><button class="btn sec" id="stampaF">🖨️ Stampa</button></div>`;
+      const giriAum = pf.giri.filter((n, i) => i === 0 || n > pf.giri[i - 1]);
+      animazione($('#anFormA'), { d: diagrammaTondo(giriCerchioMb(Math.min(6, giriAum.length))), didascalie: pf.passi });
+      $$('.schede-tab button', v).forEach(b => b.onclick = () => { st.tipo = b.dataset.t; st.alt = 0; salvaSt(); disegna(); });
+      $('#fMax').oninput = e => { st.max = +e.target.value; st.alt = 0; salvaSt(); disegna(); };
+      if ($('#fAlt')) $('#fAlt').oninput = e => { st.alt = +e.target.value; salvaSt(); disegna(); };
+      $('#crea').onclick = () => {
+        const nome = prompt('Nome del progetto:', `${FORME[st.tipo].nome.split(' (')[0]} da ${st.max} maglie`); if (!nome) return;
+        const p = { id: nuovoId(), agg: ora(), creato: ora(), nome, schemaId: '', stato: 'incorso', uncinetto: '2,5', filato: '', note: '', foto: '', fatti: [],
+          passiPropri: pf.passi.map(x => ({ s: x, e: x })), contatori: [nuovoContatore('Giro'), nuovoContatore('Maglie', true)] };
+        D().progetti.push(p); Archivio.salva(); Nav.vai('progetto', p.id); avviso('Progetto creato!');
+      };
+      $('#stampaF').onclick = () => {
+        $('#stampa').innerHTML = `<h2>${FORME[st.tipo].emoji} ${FORME[st.tipo].nome} – ${st.max} maglie</h2>${sagomaSVG(pf.giri)}<ol>${pf.passi.map(p => `<li>${esc(p)}</li>`).join('')}</ol><p class="piccolo">SirJoe Uncinetto – Progettista di forme</p>`;
+        setTimeout(() => Piattaforma.stampa(), 200);
+      };
+    };
+    const salvaSt = () => { Archivio.imp.forma = st; Archivio.salvaImp(); };
+    disegna();
+  },
+});
 
 /* ---------------- Utilità ---------------- */
 function riduciFoto(file) {

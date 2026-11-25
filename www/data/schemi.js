@@ -13,7 +13,10 @@ const CATEGORIE = [
   { id: 'borse', nome: 'Borse', emoji: '👜', desc: 'Shopper e pochette' },
   { id: 'bimbi', nome: 'Per bambini', emoji: '🍼', desc: 'Copertine e bavaglini' },
   { id: 'feste', nome: 'Feste', emoji: '🎄', desc: 'Natale, Halloween e altro' },
+  { id: 'centrini', nome: 'Centrini', emoji: '❄️', desc: 'Merletti in tondo' },
+  { id: 'idee', nome: 'Idee regalo', emoji: '🎁', desc: 'Piccoli lavori veloci' },
 ];
+const ripeti = (arr, n) => Array.from({ length: n }, () => arr).flat();
 
 const P = (s, e) => ({ s, e: e || s });
 
@@ -309,4 +312,132 @@ const SCHEMI = [
       P('Spicchi: con l\'ago passa il filo dal fondo alla cima, avvolgilo sull\'esterno e ripassa dal centro. Tira un poco. Fallo 6 volte intorno.', '6 giri di filo dal centro per gli spicchi.'),
       P('Picciolo: con il marrone cerchio magico con 5 mb, 3 giri di 5 mb. Cucilo in cima. Aggiungi una foglia verde.', 'Picciolo 5 mb ×4 giri; foglia.')],
     consigli: 'Fanne tre di misure diverse (fermando gli aumenti a 30, 36 e 42 maglie) per una bella composizione.' },
+
+  /* ================= MODELLI ESCLUSIVI (Scuola di schemi) ================= */
+  { id: 'centrino-sole', cat: 'centrini', nuovo: true, titolo: 'Centrino Sole a 8 ventagli', emoji: '☀️', livello: 2, tempo: '3 ore', misure: 'circa 18-20 cm',
+    materiale: ['Cotone sottile per uncinetto (circa 30 g)', 'Uncinetto 2-2,5 mm', 'Spilli e asciugamano per il bloccaggio'],
+    intro: 'Un centro pieno, poi raggi e ventagli che si allargano come raggi di sole. Ogni spicchio si ripete 8 volte.',
+    diagramma: () => diagrammaTondo([Array(16).fill('ma'), ripeti(['ma', 'cat'], 16), ripeti(['ma', 'ma', 'cat', 'cat'], 16),
+      ripeti(['ma', 'ma', 'cat', 'cat', 'ma', 'ma', 'cat', 'cat', 'mb', 'cat', 'cat'], 8),
+      ripeti(['ma', 'ma', 'ma', 'cat', 'cat', 'ma', 'ma', 'ma', 'cat', 'cat', 'cat', 'mb', 'cat', 'cat', 'cat'], 8)], { passo: 26 }),
+    passi: [
+      P('Giro 1: cerchio magico. 3 catenelle (valgono come 1 maglia alta) e 15 maglie alte dentro il cerchio. Stringi e chiudi con 1 mbss nella 3ª catenella. (16 maglie)', 'G1: 3 cat, 15 ma nel cm, mbss (16).'),
+      P('Giro 2: 4 catenelle (valgono come 1 ma + 1 cat). Poi *1 ma nella maglia successiva, 1 catenella* per 15 volte. Chiudi con mbss nella 3ª delle 4 catenelle. Hai 16 raggi con 16 spazi.', 'G2: 4 cat, (1 ma, 1 cat) ×15, mbss (16 ma, 16 sp).'),
+      P('Giro 3: 1 mbss per entrare nel primo spazio. 3 catenelle e 1 ma nello stesso spazio, 2 catenelle. Poi *2 ma nello spazio successivo, 2 catenelle* per 15 volte. Chiudi. (32 ma)', 'G3: (2 ma, 2 cat) in ogni sp (32 ma).'),
+      P('Giro 4 (ventagli): vai con le mbss fino al primo spazio da 2 catenelle. *In questo spazio fai un ventaglio: 2 ma, 2 cat, 2 ma. Poi 2 catenelle, 1 maglia bassa nello spazio dopo, 2 catenelle.* Ripeti 8 volte e chiudi. (8 ventagli)', 'G4: [(2 ma, 2 cat, 2 ma) nello sp, 2 cat, 1 mb nello sp succ, 2 cat] ×8.'),
+      P('Giro 5: mbss fino al centro del primo ventaglio. *Nel centro del ventaglio: 3 ma, 2 cat, 3 ma. Poi 3 catenelle, 1 mb sulla maglia bassa del giro sotto, 3 catenelle.* Ripeti 8 volte e chiudi.', 'G5: [(3 ma, 2 cat, 3 ma) nel vent., 3 cat, 1 mb sulla mb, 3 cat] ×8.'),
+      P('Giro 6: come il giro 5, ma più grande: nel ventaglio 4 ma, 3 cat, 4 ma; ai lati archetti di 4 catenelle.', 'G6: [(4 ma, 3 cat, 4 ma) nel vent., 4 cat, 1 mb sulla mb, 4 cat] ×8.'),
+      P('Giro 7 (bordo con picot): sulle maglie alte fai 1 mb ciascuna; in ogni archetto di 4 catenelle 5 mb; nella punta del ventaglio 3 mb, 1 picot (3 catenelle chiuse con 1 mbss nella prima), 3 mb. Chiudi e nascondi i fili.', 'G7: mb su ogni ma, 5 mb negli archetti, (3 mb, picot, 3 mb) nelle punte.'),
+      P('Bagna il centrino, strizzalo nell\'asciugamano e fissalo con gli spilli sopra un cuscino o un tappetino, tirando ogni punta. Lascia asciugare.', 'Bloccaggio a umido con spilli.')],
+    consigli: 'Se dal giro 5 il centrino si arriccia, aggiungi 1 catenella in più negli archetti; se fa le onde, togline una.' },
+
+  { id: 'centrino-stella', cat: 'centrini', nuovo: true, titolo: 'Centrino Stellina a 6 punte', emoji: '⭐', livello: 2, tempo: '1 ora e mezza', misure: 'circa 12 cm',
+    materiale: ['Cotone sottile bianco o colorato', 'Uncinetto 2,5 mm'],
+    intro: 'Piccolo e veloce: perfetto sotto un vasetto, come decorazione per l\'albero o da cucire su un cuscino.',
+    diagramma: () => diagrammaTondo([Array(12).fill('ma'), ripeti(['ma', 'cat', 'cat'], 12), ripeti(['ma', 'ma', 'cat', 'cat', 'ma', 'ma', 'mb'], 6),
+      ripeti(['ma', 'ma', 'ma', 'cat', 'cat', 'cat', 'ma', 'ma', 'ma', 'cat', 'cat', 'mb', 'cat', 'cat'], 6)], { passo: 26 }),
+    passi: [
+      P('Giro 1: cerchio magico, 3 catenelle e 11 maglie alte. Chiudi con mbss. (12)', 'G1: 3 cat, 11 ma nel cm (12).'),
+      P('Giro 2: 5 catenelle (valgono 1 ma + 2 cat). *1 ma nella maglia successiva, 2 catenelle* per 11 volte. Chiudi nella 3ª catenella. (12 raggi)', 'G2: 5 cat, (1 ma, 2 cat) ×11, mbss.'),
+      P('Giro 3: mbss nel primo spazio. Nello spazio: 3 cat, 1 ma, 2 cat, 2 ma (prima punta). 1 mb nello spazio dopo. *Nello spazio seguente 2 ma, 2 cat, 2 ma; 1 mb nello spazio dopo* per 5 volte. Chiudi. (6 punte)', 'G3: [(2 ma, 2 cat, 2 ma) in uno sp, 1 mb nel succ.] ×6.'),
+      P('Giro 4: mbss fino alla punta. *Nella punta 3 ma, 3 cat, 3 ma; 2 catenelle, 1 mb sulla mb, 2 catenelle* per 6 volte. Chiudi.', 'G4: [(3 ma, 3 cat, 3 ma) nella punta, 2 cat, 1 mb sulla mb, 2 cat] ×6.'),
+      P('Giro 5: 1 mb su ogni ma, 2 mb in ogni spazio da 2 catenelle e nelle punte 3 mb, 1 picot, 3 mb. Chiudi e blocca a umido.', 'G5: mb tutto intorno, (3 mb, picot, 3 mb) nelle punte; blocca.')],
+    consigli: 'Con un cotone dorato e un anellino di catenelle diventa una decorazione natalizia.' },
+
+  { id: 'poncho', cat: 'vestire', nuovo: true, titolo: 'Poncho a due rettangoli', emoji: '🧥', livello: 1, tempo: '15-20 ore', misure: 'adulto, taglia unica (rettangoli 50 × 70 cm)',
+    materiale: ['Lana media circa 600 g', 'Uncinetto 6 mm', 'Ago da lana'],
+    intro: 'Il capo più facile da inventare: due rettangoli uguali cuciti a "L". Punto "colonnine" alternando maglia bassa e maglia alta.',
+    diagramma: () => diagrammaRighe(Array.from({ length: 4 }, () => ripeti(['mb', 'ma'], 6).concat(['mb']))),
+    passi: [
+      P('Rettangolo A: fai una catenella lunga 70 cm con un numero PARI di catenelle (circa 100 con lana media).', 'A: catenella di 70 cm, n. pari (~100).'),
+      P('Riga 1: 1 mb nella 2ª catenella, poi *1 ma, 1 mb* fino alla fine. Finisci con 1 mb.', 'R1: dalla 2ª cat (mb, ma) ripetuti, finisci con mb.'),
+      P('Righe seguenti: 1 catenella, gira, *1 mb, 1 ma* fino alla fine, finendo con 1 mb. Le maglie si impilano formando colonnine. Continua fino a 50 cm.', 'R2+: 1 cat, gira, (mb, ma) … mb; fino a 50 cm.'),
+      P('Rettangolo B: uguale al rettangolo A.', 'B = A.'),
+      P('Unione: cuci il lato corto di A sui primi 50 cm del lato lungo di B. Poi cuci il lato corto di B sul lato lungo di A. Si forma l\'apertura per la testa.', 'Cuci corto A su lungo B e corto B su lungo A.'),
+      P('Bordo: 1 giro di maglie basse intorno al collo. Sul bordo inferiore aggiungi frange di 20 cm o un giro di punto gambero.', 'Bordo mb al collo; frange o punto gambero in basso.')],
+    consigli: 'Guarda il disegno nella lezione "Progettare abbigliamento e borse": si capisce al volo come si uniscono.' },
+
+  { id: 'scaldamuscoli', cat: 'vestire', nuovo: true, titolo: 'Scaldamuscoli a coste', emoji: '🧦', livello: 2, tempo: '4 ore', misure: 'circonferenza 32 cm, lunghezza 35 cm',
+    materiale: ['Lana media circa 150 g', 'Uncinetto 5,5 mm', 'Ago da lana'],
+    intro: 'Due tubi lavorati in tondo con le coste in rilievo in alto e in basso, così stanno su da soli.',
+    diagramma: () => diagrammaRighe([Array(12).fill('ma'), ripeti(['rilav', 'rildi'], 6), ripeti(['rilav', 'rildi'], 6)]),
+    passi: [
+      P('Fai 36 catenelle e chiudile ad anello con 1 mbss, facendo attenzione che la catenella non sia attorcigliata. Prova che passi bene dal piede al polpaccio.', '36 cat, chiudi ad anello senza torcere.'),
+      P('Giro 1: 3 catenelle (valgono 1 ma) e 1 ma in ogni catenella. Chiudi. (36)', 'G1: 36 ma.'),
+      P('Giri 2-7 (costa): 2 catenelle, poi *1 ma in rilievo davanti, 1 ma in rilievo dietro* tutto intorno. Chiudi a ogni giro.', 'G2-7: (ma ril.av, ma ril.di) ×18.'),
+      P('Giri successivi: 1 ma in ogni maglia, finché misura 28 cm.', 'Giri di ma fino a 28 cm.'),
+      P('Ultimi 6 giri: costa in rilievo come all\'inizio. Chiudi e nascondi i fili. Fanne un secondo uguale.', 'Ultimi 6 giri a costa; ripeti per il secondo.')],
+    consigli: 'Per i bambini parti da 28 catenelle (numero pari) e fermati a 22 cm.' },
+
+  { id: 'secchiello', cat: 'borse', nuovo: true, titolo: 'Borsa a secchiello con laccio', emoji: '👜', livello: 2, tempo: '8 ore', misure: 'diametro 20 cm, altezza 25 cm',
+    materiale: ['Cotone o cordino di cotone circa 300 g', 'Uncinetto 4-4,5 mm', 'Segnapunti', 'Ago da lana'],
+    intro: 'Fondo tondo, pareti a "punto V" traforato e un laccio che la chiude a sacchetto.',
+    diagramma: () => diagrammaTondo(giriCerchioMb(5)),
+    passi: [
+      P('Fondo: lavora il cerchio piatto a maglia bassa fino al giro 12. (72) Chiudi con mbss.', 'Fondo: cerchio mb fino a G12 (72).'),
+      P('Giro 13: 72 maglie basse solo nel filo posteriore: si forma lo spigolo.', 'G13: 72 mb fp.'),
+      P('Giro 14 (punto V): 4 catenelle (valgono 1 ma + 1 cat), 1 ma nella stessa maglia. *Salta 2 maglie, nella successiva fai 1 ma, 1 cat, 1 ma* per 23 volte. Chiudi. (24 V)', 'G14: [V = (ma, 1 cat, ma)] in ogni 3ª maglia ×24.'),
+      P('Giri 15-38: mbss fino al centro della prima V, poi 1 V nel centro di ogni V. Continua finché la borsa è alta 22 cm.', 'G15-38: V nel centro di ogni V.'),
+      P('Giro con i fori per il laccio: prima 1 giro di 72 mb (3 mb in ogni V). Poi 4 catenelle, salta 1 maglia, *1 ma, 1 catenella, salta 1* tutto intorno. (36 fori)', '72 mb; poi giro (ma, 1 cat, salta 1) ×36.'),
+      P('Finitura: 2 giri di maglie basse. Laccio: catenella di 110 cm ripassata con mbss, infilata nei fori. Tracolla: striscia di 6 mb larga e lunga 100 cm, cucita ai due lati.', '2 giri mb; laccio di cat 110 cm; tracolla 6 mb × 100 cm.')],
+    consigli: 'Con un cordino di cotone più spesso usa uncinetto 6 mm e fermati al giro 10 (60 maglie): il punto V diventa allora (salta 2) ×20.' },
+
+  { id: 'porta-telefono', cat: 'borse', nuovo: true, titolo: 'Porta-telefono a tracolla', emoji: '📱', livello: 1, tempo: '2 ore', misure: 'su misura del tuo telefono',
+    materiale: ['Cotone medio circa 60 g', 'Uncinetto 3,5 mm', 'Segnapunti'],
+    intro: 'Un sacchettino lavorato in tondo partendo da una catenella: la catenella è larga quanto il telefono.',
+    diagramma: null,
+    passi: [
+      P('Fai una catenella lunga quanto il lato corto del telefono più 1 cm (circa 14 catenelle).', 'Cat = larghezza telefono + 1 cm (~14).'),
+      P('Giro 1: 1 mb nella 2ª catenella e in tutte le altre, 3 mb nell\'ultima. Gira intorno e lavora sull\'altro lato della catenella: 1 mb in ogni catenella, 2 mb nella prima (dove c\'è già 1 mb). (28 con 14 catenelle)', 'G1: mb su entrambi i lati della catenella, 3 mb alle estremità (28).'),
+      P('Giri seguenti: 1 maglia bassa in ogni maglia, in spirale, senza aumenti. Continua finché il sacchetto è alto quanto il telefono meno 2 cm.', 'Giri di mb in spirale fino ad altezza telefono − 2 cm.'),
+      P('Bordo: 2 giri nel filo posteriore per un orlo morbido.', '2 giri mb fp.'),
+      P('Tracolla: catenella di 120 cm, poi ripassala con mbss per irrobustirla. Cuci le estremità ai due lati del sacchetto.', 'Tracolla 120 cm di cat + mbss, cucita ai lati.')],
+    consigli: 'Aggiungi un fiore a 5 petali o una lettera ricamata per renderlo unico.' },
+
+  { id: 'micio', cat: 'amigurumi', nuovo: true, titolo: 'Micio Batuffolo', emoji: '🐱', livello: 2, tempo: '5 ore', misure: 'circa 15 cm seduto',
+    materiale: ['Cotone 3 mm in un colore principale e un po\' di rosa e nero', 'Uncinetto 2,5 mm', 'Imbottitura', 'Spilli', 'Ago da lana'],
+    intro: 'Un gattino costruito con le forme base: testa sfera, corpo ovale, orecchie a cono, zampe a tubo.',
+    diagramma: () => diagrammaTondo(giriCerchioMb(6)),
+    passi: [
+      P('Testa (sfera da 36): giri 1-6 aumentando fino a 36 maglie. Giri 7-13: 36 mb. Giri 14-18: diminuisci (30, 24, 18, 12, 6), imbottendo prima di chiudere.', 'Testa: aum fino a 36 (G6), G7-13 dritti, dim G14-18.'),
+      P('Corpo (ovale da 30): giri 1-5 fino a 30 maglie. Giri 6-14: 30 mb. Giri 15-17: diminuisci a 24, 18, 12. Imbottisci e lascia aperto per cucirlo alla testa.', 'Corpo: aum fino a 30, G6-14 dritti, dim fino a 12, aperto.'),
+      P('Orecchie (2): cerchio magico con 4 mb. Giro 2: (1 mb, aum) ×2 (6). Giro 3: (1 mb, aum) ×3 (9). Giro 4: (2 mb, aum) ×3 (12). Giro 5: 12 mb. Non imbottire, schiaccia e cuci in cima alla testa.', 'Orecchie ×2: 4, 6, 9, 12, 12 mb; non imbottite.'),
+      P('Zampe (4): 6 mb nel cerchio magico, giro 2: (2 mb, aum) ×2 (8), giri 3-8: 8 mb. Imbottisci poco.', 'Zampe ×4: 6, 8, poi 6 giri a 8.'),
+      P('Coda: 6 mb nel cerchio magico e 15 giri di 6 mb. Non imbottire.', 'Coda: 6 mb × 16 giri.'),
+      P('Viso: ricama gli occhi tra i giri 9 e 10, a 6 maglie di distanza; il naso rosa a triangolo in mezzo, più in basso; baffi con 3 fili per lato.', 'Occhi G9-10 a 6 m.; naso rosa; baffi.'),
+      P('Montaggio: fissa tutto con gli spilli, controlla che stia seduto dritto, poi cuci testa, zampe e coda.', 'Spilla, verifica, cuci.')],
+    consigli: 'Cambia colore ogni 2 giri nel corpo e ottieni un micio tigrato.' },
+
+  { id: 'polpo', cat: 'amigurumi', nuovo: true, titolo: 'Polpo Ricciolo', emoji: '🐙', livello: 1, tempo: '2 ore', misure: 'circa 10 cm',
+    materiale: ['Cotone 3 mm', 'Uncinetto 2,5 mm', 'Imbottitura', 'Filo nero per gli occhi'],
+    intro: 'Testa a sfera e otto tentacoli che si arricciano da soli: è la magia degli aumenti su una catenella.',
+    diagramma: () => diagrammaTondo(giriCerchioMb(5)),
+    passi: [
+      P('Testa: lavora la pallina base (giri 1-14) imbottendola bene. Lascia un filo lungo.', 'Testa = pallina base.'),
+      P('Tentacoli (8): fai 16 catenelle. Dalla 2ª catenella lavora 2 mb in ogni catenella: il tentacolo si avvolge a spirale come un ricciolo. Lascia un filo per cucire.', 'Tentacoli ×8: 16 cat, 2 mb in ogni cat dalla 2ª.'),
+      P('Cuci i tentacoli in cerchio sotto la testa, tutti vicini.', 'Cuci i tentacoli sotto la testa.'),
+      P('Ricama due occhi a 5 maglie di distanza e un piccolo sorriso.', 'Occhi e sorriso ricamati.')],
+    consigli: 'Con 3 mb in ogni catenella i riccioli diventano più fitti e "pazzi".' },
+
+  { id: 'segnalibro', cat: 'idee', nuovo: true, titolo: 'Segnalibro con nappina', emoji: '🔖', livello: 1, tempo: '45 minuti', misure: 'circa 4 × 18 cm',
+    materiale: ['Cotone sottile', 'Uncinetto 2,5-3 mm', 'Cartoncino per la nappina'],
+    intro: 'Una striscia sottile di mezze maglie alte con una nappina in fondo. Regalo perfetto con un libro.',
+    diagramma: () => diagrammaRighe(righeUguali(4, 7, 'mma')),
+    passi: [
+      P('Fai 9 catenelle. Riga 1: 1 mma dalla 3ª catenella. (7)', '9 cat; R1: 7 mma.'),
+      P('Righe seguenti: 2 catenelle, gira, 7 mma. Continua fino a 18 cm.', 'R2+: 7 mma fino a 18 cm.'),
+      P('Bordo: 1 giro di maglie basse tutto intorno, con 3 mb negli angoli.', 'Bordo mb.'),
+      P('Nappina: avvolgi il filo 30 volte intorno a un cartoncino largo 6 cm. Lega in alto con un filo, taglia in basso, stringi con un giro di filo a 1 cm dalla cima. Cucila in fondo al segnalibro.', 'Nappina 30 giri su 6 cm; cucila.')],
+    consigli: 'Ricama un\'iniziale a punto catenella per personalizzarlo.' },
+
+  { id: 'portamatite', cat: 'idee', nuovo: true, titolo: 'Portamatite / copri-barattolo', emoji: '✏️', livello: 1, tempo: '2 ore', misure: 'diametro 8 cm, altezza 11 cm',
+    materiale: ['Cotone medio in 2-3 colori', 'Uncinetto 3,5 mm', 'Un barattolo vuoto (facoltativo)'],
+    intro: 'Un cilindro progettato con il Progettista di forme: fondo piatto, spigolo e pareti dritte.',
+    diagramma: () => diagrammaTondo(giriCerchioMb(6)),
+    passi: [
+      P('Fondo: cerchio piatto a maglia bassa fino al giro 6. (36) Se usi un barattolo, controlla che il fondo sia largo come il suo.', 'Fondo: cerchio mb fino a 36.'),
+      P('Giro 7: 36 mb solo nel filo posteriore (spigolo).', 'G7: 36 mb fp.'),
+      P('Giri 8-30: 36 mb a giro. Cambia colore ogni 4 giri per fare le righe.', 'G8-30: 36 mb, righe ogni 4 giri.'),
+      P('Bordo: 1 giro di punto gambero. Infila il barattolo dentro, se vuoi.', 'Bordo: punto gambero.')],
+    consigli: 'Fanne tre di altezze diverse per una scrivania tutta coordinata.' },
 ];
