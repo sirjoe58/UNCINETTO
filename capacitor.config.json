@@ -1,0 +1,6 @@
+{
+  "appId": "it.sirjoe.uncinetto",
+  "appName": "SirJoe Uncinetto",
+  "webDir": "www",
+  "android": { "allowMixedContent": false }
+}
