@@ -28,7 +28,7 @@ const Nav = {
     const { vista, param } = this.attuale();
     Piattaforma.schermoAcceso(vista === 'contatore' || vista === 'progetto' ? Archivio.imp.schermo : false);
     $('#btnIndietro').hidden = this.pila.length <= 1;
-    const radiceMenu = { home: 'home', contatore: 'contatore', schemi: 'schemi', categoria: 'schemi', schema: 'schemi', progetti: 'progetti', progetto: 'progetti', scuola: 'home', lezione: 'home', forme: 'home' }[vista] || 'altro';
+    const radiceMenu = { home: 'home', contatore: 'contatore', schemi: 'schemi', categoria: 'schemi', schema: 'schemi', progetti: 'progetti', progetto: 'progetti', scuola: 'home', lezione: 'home', forme: 'home', foto: 'home' }[vista] || 'altro';
     $$('#menu button').forEach(b => b.classList.toggle('attivo', b.dataset.vai === radiceMenu && this.pila.length >= 1));
     const v = $('#vista'); v.scrollTop = 0;
     (VISTE[vista] || VISTE.home)(v, param);
@@ -121,11 +121,11 @@ const VISTE = {
       ${inCorso ? `<div class="riga" id="riprendi">${inCorso.foto ? `<img class="miniatura" src="${inCorso.foto}">` : '<span class="emoji">🧶</span>'}
         <div class="cresci"><b>Riprendi: ${esc(inCorso.nome)}</b><small>${inCorso.contatori.map(c => `${esc(c.nome)} ${c.valore}`).join(' · ')}</small></div><span>›</span></div><br>` : ''}
       <div class="griglia">
-        ${[['scuola', '🎓', 'Scuola di schemi', `${LEZIONI.length} lezioni con animazioni`], ['forme', '🧸', 'Progettista di forme', 'Inventa un amigurumi'],
+        ${[['foto', '📸', 'Da foto a schema', 'L\'intelligenza artificiale scrive lo schema'], ['scuola', '🎓', 'Scuola di schemi', `${LEZIONI.length} lezioni con animazioni`], ['forme', '🧸', 'Progettista di forme', 'Inventa un amigurumi'],
            ['contatore', '➕', 'Contatore', 'Conta giri e maglie'], ['schemi', '🧶', 'Schemi', `${SCHEMI.length} schemi in ${CATEGORIE.length} categorie`],
            ['progetti', '📁', 'I miei progetti', `${D().progetti.length} progetti`], ['mieiSchemi', '✏️', 'Disegna schemi', 'Griglia a colori e simboli'],
            ['libreria', '📖', 'Libreria punti', `${PUNTI.length} punti spiegati`], ['calcolatori', '🧮', 'Calcolatori', 'Campione, filato, aumenti'],
-           ['online', '🌐', 'Trova online', 'Siti di schemi gratuiti'], ['impostazioni', '⚙️', 'Impostazioni', 'NAS, testo, modalità']]
+           ['online', '🌐', 'Trova online', 'Schemi gratis da stampare e social'], ['impostazioni', '⚙️', 'Impostazioni', 'NAS, testo, modalità']]
           .map(([id, e, t, d]) => `<button class="tessera" data-vai="${id}"><span class="emoji">${e}</span><b>${t}</b><small>${d}</small></button>`).join('')}
       </div>`;
     if (inCorso) $('#riprendi').onclick = () => Nav.vai('progetto', inCorso.id);
@@ -178,6 +178,7 @@ const VISTE = {
         <div class="bottoni">
           <button class="btn verde" id="inizia">▶ Inizia un progetto con questo schema</button>
           <button class="btn sec" id="stampaS">🖨️ Stampa</button>
+          <button class="btn sec" id="esportaS">📤 Testo per app contarighe</button>
           <button class="btn sec" id="libreria">📖 Libreria punti</button>
           <button class="btn sec" id="azzera">Togli le spunte</button>
         </div>`;
@@ -189,6 +190,7 @@ const VISTE = {
         D().progetti.push(p); Archivio.salva(); Nav.vai('progetto', p.id); avviso('Progetto creato!');
       };
       $('#stampaS').onclick = () => stampaSchema(s);
+      $('#esportaS').onclick = () => mostraTesto(schemaInTesto(s), s.titolo);
       $('#libreria').onclick = () => Nav.vai('libreria');
       $('#azzera').onclick = () => { D().progressi[s.id] = { agg: ora(), fatti: [] }; Archivio.salva(); disegna(); };
     };
@@ -226,6 +228,8 @@ const VISTE = {
         <div id="cc"></div>
         ${s ? `<h3>Passi dello schema: ${esc(s.titolo)}</h3><div id="modo"></div>${passiHTML(s, p.fatti, p.id)}
           ${sOrig ? '<div class="bottoni"><button class="btn sec" id="apriSchema">Apri schema completo e diagramma</button></div>' : ''}` : ''}
+        ${s ? '<div class="bottoni"><button class="btn sec" id="esportaP">📤 Testo per app contarighe</button></div>' : ''}
+        ${p.testoSchema ? `<details class="scheda"><summary><b>📄 Schema completo (materiali, legenda, assemblaggio)</b></summary>${testoInHTML(p.testoSchema)}</details>` : ''}
         ${mio ? `<div class="bottoni"><button class="btn sec" id="apriMio">✏️ Apri il mio schema "${esc(mio.nome)}"</button></div>` : ''}
         <div class="scheda">
           <label>Nome</label><input id="pNome" value="${esc(p.nome)}">
@@ -249,6 +253,7 @@ const VISTE = {
         if (sOrig) $('#apriSchema').onclick = () => Nav.vai('schema', s.id);
       }
       if (mio) $('#apriMio').onclick = () => Nav.vai('editor', mio.id);
+      if ($('#esportaP')) $('#esportaP').onclick = () => mostraTesto(p.testoSchema || schemaInTesto({ ...s, titolo: p.nome }), p.nome);
       $('#pNome').onchange = e => { p.nome = e.target.value || p.nome; titolo(p.nome); salva(); };
       $('#pStato').onchange = e => { p.stato = e.target.value; salva(); if (p.stato === 'finito') avviso('Complimenti! 🎉'); };
       $('#pUnc').onchange = e => { p.uncinetto = e.target.value; salva(); };
@@ -264,7 +269,7 @@ const VISTE = {
 
   altro(v) {
     titolo('Altro');
-    v.innerHTML = `<div class="griglia">${[['scuola', '🎓', 'Scuola di schemi'], ['forme', '🧸', 'Progettista di forme'], ['mieiSchemi', '✏️', 'Disegna schemi'], ['libreria', '📖', 'Libreria punti'], ['calcolatori', '🧮', 'Calcolatori'],
+    v.innerHTML = `<div class="griglia">${[['foto', '📸', 'Da foto a schema'], ['importa', '📥', 'Importa schema scritto'], ['scuola', '🎓', 'Scuola di schemi'], ['forme', '🧸', 'Progettista di forme'], ['mieiSchemi', '✏️', 'Disegna schemi'], ['libreria', '📖', 'Libreria punti'], ['calcolatori', '🧮', 'Calcolatori'],
       ['online', '🌐', 'Trova online'], ['impostazioni', '⚙️', 'Impostazioni'], ['guida', '❓', 'Guida all\'app']]
       .map(([id, e, t]) => `<button class="tessera" data-vai="${id}"><span class="emoji">${e}</span><b>${t}</b></button>`).join('')}</div>`;
     $$('.tessera', v).forEach(t => t.onclick = () => Nav.vai(t.dataset.vai));
@@ -326,11 +331,15 @@ const VISTE = {
 
   online(v) {
     titolo('Trova online');
-    v.innerHTML = `<p class="tenue">Siti con tanti schemi gratuiti. Tocca un nome: la pagina si apre nel browser. Gli schemi appartengono ai loro autori.</p>` +
-      LINK_ONLINE.map(g => `<h3>${g.emoji} ${g.cat}</h3><div class="lista">${g.link.map(l => `
-        <div class="riga" data-url="${esc(l.url)}"><span class="emoji">🔗</span><div class="cresci"><b>${esc(l.nome)}</b><small>${esc(l.nota)}</small></div><span>↗</span></div>`).join('')}</div>`).join('') +
+    v.innerHTML = `<p class="tenue">Schemi gratuiti divisi per categoria: 🖨️ = PDF gratuito da scaricare e stampare. Tocca un nome e la pagina si apre nel browser; sotto ogni categoria trovi le ricerche già pronte su Pinterest, YouTube, Instagram, Facebook e TikTok. Gli schemi appartengono ai loro autori.</p>` +
+      `<div class="schede-tab">${LINK_ONLINE.map((g, i) => `<button data-salta="${i}">${g.emoji} ${g.cat.split(' (')[0]}</button>`).join('')}</div>` +
+      LINK_ONLINE.map((g, i) => `<h3 id="cat${i}">${g.emoji} ${g.cat}</h3><div class="lista">${g.link.map(l => `
+        <div class="riga" data-url="${esc(l.url)}"><span class="emoji">${l.pdf ? '🖨️' : '🔗'}</span><div class="cresci"><b>${esc(l.nome)}</b>${l.pdf ? '<span class="nuovo">PDF da stampare</span>' : ''}<small>${esc(l.nota)}</small></div><span>↗</span></div>`).join('')}</div>
+        <div class="bottoni" style="margin-top:6px"><span class="piccolo tenue" style="align-self:center">Cerca sui social:</span>${SOCIAL.map((so, k) => `<button class="btn sec piccolo" data-so="${k}" data-q="${esc(g.social)}">${so.emoji} ${so.nome}</button>`).join('')}</div>`).join('') +
       `<div class="consiglio">💡 Negli schemi in inglese: <b>sc</b> = maglia bassa, <b>hdc</b> = mezza maglia alta, <b>dc</b> = maglia alta, <b>tr</b> = maglia altissima, <b>ch</b> = catenella, <b>sl st</b> = maglia bassissima. Attenzione: negli schemi inglesi (UK) "dc" significa maglia bassa! Controlla sempre se lo schema è US o UK.</div>`;
     $$('[data-url]', v).forEach(r => r.onclick = () => Piattaforma.apriLink(r.dataset.url));
+    $$('[data-so]', v).forEach(b => b.onclick = () => Piattaforma.apriLink(SOCIAL[+b.dataset.so].url(b.dataset.q)));
+    $$('[data-salta]', v).forEach(b => b.onclick = () => { const t = $('#cat' + b.dataset.salta); t && t.scrollIntoView({ behavior: 'smooth' }); });
   },
 
   impostazioni(v) {
@@ -343,12 +352,22 @@ const VISTE = {
         <label><input type="checkbox" id="iVibra" style="width:auto"> Vibrazione a ogni +1 (telefono)</label>
         <label><input type="checkbox" id="iSchermo" style="width:auto"> Tieni lo schermo acceso mentre conti</label>
       </div>
+      <div class="scheda"><h3 style="margin-top:0">🤖 Intelligenza artificiale (Da foto a schema)</h3>
+        <p class="tenue piccolo">Serve una chiave API di Anthropic (console.anthropic.com → API Keys). Ogni foto analizzata costa pochi centesimi, addebitati sul tuo account Anthropic. La chiave resta solo su questo dispositivo e non viene copiata sul NAS.</p>
+        <label>Chiave API</label><input id="iChiave" type="password" placeholder="sk-ant-..." autocomplete="off">
+        <label>Modello</label><select id="iModello">${MODELLI_IA.map(m => `<option value="${m.id}">${m.nome}</option>`).join('')}</select>
+        <div class="bottoni"><button class="btn sec piccolo" id="iMostra">👁 Mostra/nascondi</button><button class="btn sec piccolo" id="iConsole">🔑 Crea una chiave (sito Anthropic)</button></div></div>
       <div class="scheda" id="nas"></div>
       <div class="scheda"><h3 style="margin-top:0">Copia di sicurezza</h3>
         <p class="tenue piccolo">Salva un file con tutti i progetti e gli schemi, oppure recuperali da un file.</p>
         <div class="bottoni"><button class="btn sec" id="esporta">💾 Esporta copia</button><button class="btn sec" id="importaB">📂 Importa copia</button>
         <input type="file" id="importa" accept=".json,application/json" hidden></div></div>
-      <p class="tenue piccolo">SirJoe Uncinetto 1.1 · ${PIATTAFORMA}</p>`;
+      <p class="tenue piccolo">SirJoe Uncinetto 1.2 · ${PIATTAFORMA}</p>`;
+    $('#iChiave').value = imp.chiaveIA || ''; $('#iModello').value = imp.modelloIA || MODELLI_IA[0].id;
+    $('#iChiave').onchange = e => { imp.chiaveIA = e.target.value.trim(); Archivio.salvaImp(); avviso('Chiave salvata su questo dispositivo'); };
+    $('#iModello').onchange = e => { imp.modelloIA = e.target.value; Archivio.salvaImp(); };
+    $('#iMostra').onclick = () => { const i = $('#iChiave'); i.type = i.type === 'password' ? 'text' : 'password'; };
+    $('#iConsole').onclick = () => Piattaforma.apriLink('https://console.anthropic.com/settings/keys');
     $('#iModo').value = imp.modo; $('#iTesto').value = imp.testo; $('#iVibra').checked = imp.vibra; $('#iSchermo').checked = imp.schermo;
     $('#iModo').onchange = e => { imp.modo = e.target.value; Archivio.salvaImp(); };
     $('#iTesto').onchange = e => { imp.testo = e.target.value; Archivio.salvaImp(); applicaTesto(); };
@@ -608,6 +627,91 @@ Object.assign(VISTE, {
     };
     const salvaSt = () => { Archivio.imp.forma = st; Archivio.salvaImp(); };
     disegna();
+  },
+});
+
+
+/* ---------------- Da foto a schema / testo ---------------- */
+function mostraTesto(testo, nome) {
+  const v = $('#vista');
+  Nav.vai('testo', { testo, nome });
+}
+function creaProgettoDaTesto(testo, nome) {
+  const passi = testoInPassi(testo);
+  if (!passi.length) { alert('Non ho trovato righe "Giro 1:" o "Riga 1:" nel testo.'); return; }
+  const p = { id: nuovoId(), agg: ora(), creato: ora(), nome: nome || titoloDaTesto(testo), schemaId: '', stato: 'incorso', uncinetto: '', filato: '', note: '', foto: '', fatti: [],
+    passiPropri: passi, testoSchema: testo, contatori: [nuovoContatore('Giro'), nuovoContatore('Maglie', true)] };
+  D().progetti.push(p); Archivio.salva(); Nav.vai('progetto', p.id); avviso(`Progetto creato con ${passi.length} passi`);
+}
+
+Object.assign(VISTE, {
+  foto(v) {
+    titolo('Da foto a schema');
+    const st = VISTE.foto.stato || (VISTE.foto.stato = { foto: null, testo: '', note: '', tipo: 'auto' });
+    const disegna = () => {
+      v.innerHTML = `<p class="tenue">Carica la foto o il disegno di un lavoro all'uncinetto (pupazzo, centrino, presina, borsa…). L'intelligenza artificiale Claude lo analizza e scrive lo schema giro per giro, pronto per il contatore dell'app e per le app contarighe.</p>
+        ${Archivio.imp.chiaveIA ? '' : '<div class="consiglio">🔑 Prima inserisci la tua chiave API in <a class="link" href="#" id="vaiImp">Impostazioni → Intelligenza artificiale</a>.</div>'}
+        <div class="scheda">
+          <label>1. Scegli la foto</label><input type="file" id="fFile" accept="image/*">
+          ${st.foto ? `<img src="${st.foto.anteprima}" class="foto" style="margin-top:10px;object-fit:contain;background:#fff">` : ''}
+          <label>2. Che cos'è?</label><select id="fTipo"><option value="auto">Decidi tu guardando la foto</option><option value="amigurumi tridimensionale lavorato a spirale">Amigurumi / pupazzo 3D</option>
+            <option value="lavoro piatto in tondo (centrino, sottobicchiere, tappeto)">Piatto in tondo (centrino, sottobicchiere)</option><option value="lavoro piatto in piano andata e ritorno (presina, coperta, sciarpa)">Piatto in righe (presina, coperta, sciarpa)</option>
+            <option value="capo da indossare o borsa">Capo da indossare o borsa</option></select>
+          <label>3. Indicazioni (facoltative)</label><input id="fNote" placeholder="es. alto 15 cm, cotone 3 mm, colori rosa e bianco" value="${esc(st.note)}">
+          <div class="bottoni"><button class="btn verde" id="fVai" ${st.foto ? '' : 'disabled'}>✨ Crea lo schema</button></div>
+        </div>
+        <div id="fRis">${st.testo ? risultato() : ''}</div>`;
+      $('#fTipo').value = st.tipo;
+      if ($('#vaiImp')) $('#vaiImp').onclick = e => { e.preventDefault(); Nav.vai('impostazioni'); };
+      $('#fFile').onchange = async e => { const f = e.target.files[0]; if (!f) return; try { st.foto = await fotoPerIA(f); st.testo = ''; disegna(); } catch (err) { alert(err.message); } };
+      $('#fTipo').onchange = e => st.tipo = e.target.value;
+      $('#fNote').oninput = e => st.note = e.target.value;
+      $('#fVai').onclick = async () => {
+        const b = $('#fVai'); b.disabled = true; b.textContent = '⏳ Sto analizzando la foto… (30-90 secondi)';
+        try { st.testo = await chiediSchemaIA(st.foto.base64, st.note, st.tipo); disegna(); $('#fRis').scrollIntoView({ behavior: 'smooth' }); }
+        catch (err) { alert(err.message === 'Failed to fetch' ? 'Nessuna connessione a Internet.' : err.message); b.disabled = false; b.textContent = '✨ Crea lo schema'; }
+      };
+      collegaRisultato();
+    };
+    const risultato = () => `<h3>Il tuo schema</h3><div class="scheda">${testoInHTML(st.testo)}</div>
+      <div class="consiglio">⚠️ Lo schema è creato dall'intelligenza artificiale: controlla i conteggi tra parentesi e fai una prova prima di un lavoro grande.</div>
+      <div class="bottoni"><button class="btn verde" id="rProg">▶ Crea progetto con contatore</button><button class="btn sec" id="rTesto">📤 Esporta per app contarighe</button>
+        <button class="btn sec" id="rStampa">🖨️ Stampa</button><button class="btn sec" id="rRifai">↻ Rifai</button></div>`;
+    const collegaRisultato = () => {
+      if (!st.testo) return;
+      $('#rProg').onclick = () => creaProgettoDaTesto(st.testo);
+      $('#rTesto').onclick = () => mostraTesto(st.testo, titoloDaTesto(st.testo));
+      $('#rStampa').onclick = () => { $('#stampa').innerHTML = (st.foto ? `<img src="${st.foto.anteprima}" style="max-height:70mm">` : '') + testoInHTML(st.testo) + '<p class="piccolo">Creato con SirJoe Uncinetto</p>'; setTimeout(() => Piattaforma.stampa(), 200); };
+      $('#rRifai').onclick = () => $('#fVai').click();
+    };
+    disegna();
+  },
+
+  importa(v) {
+    titolo('Importa schema scritto');
+    v.innerHTML = `<p class="tenue">Incolla uno schema scritto (da un sito, da un PDF o da un'altra app). Le righe che iniziano con "Giro 1:", "Riga 1:", "G1:" o "R1:" diventano passi da spuntare, uno per giro. I titoli che iniziano con ### diventano i nomi delle parti (es. ### Testa).</p>
+      <label>Nome del progetto</label><input id="impNome" placeholder="es. Orsetto">
+      <label>Schema</label><textarea id="impTesto" style="min-height:260px" placeholder="### Testa&#10;Giro 1: 6 mb nel cm (6)&#10;Giro 2: aum x6 (12)&#10;Giri 3-5: 12 mb (12)"></textarea>
+      <div class="bottoni"><button class="btn verde" id="impVai">▶ Crea progetto</button><button class="btn sec" id="impProva">👁 Anteprima passi</button></div><div id="impAnt"></div>`;
+    $('#impVai').onclick = () => creaProgettoDaTesto($('#impTesto').value, $('#impNome').value.trim());
+    $('#impProva').onclick = () => { const p = testoInPassi($('#impTesto').value);
+      $('#impAnt').innerHTML = `<p><b>${p.length} passi trovati</b></p><ol>${p.map(x => `<li>${esc(x.s)}</li>`).join('')}</ol>`; };
+  },
+
+  testo(v, prm) {
+    titolo('Testo per app contarighe');
+    const nomeFile = (prm.nome || 'schema').replace(/[^\w\- àèéìòù]/gi, '').trim().replace(/\s+/g, '-').slice(0, 40) + '.txt';
+    v.innerHTML = `<p class="tenue">Una riga per ogni giro, nel formato "Giro 1: … (6)". Copialo e incollalo in My Row Counter, Pocket Crochet o in un'altra app, oppure salvalo come file di testo.</p>
+      <textarea id="tTesto" style="min-height:360px;font-family:Consolas,monospace;font-size:.88em">${esc(prm.testo)}</textarea>
+      <div class="bottoni"><button class="btn" id="tCopia">📋 Copia tutto</button><button class="btn sec" id="tSalva">💾 Salva file .txt</button>
+        <button class="btn sec" id="tProg">▶ Crea progetto con contatore</button></div>`;
+    $('#tCopia').onclick = async () => {
+      const t = $('#tTesto');
+      try { await navigator.clipboard.writeText(t.value); avviso('Copiato!'); }
+      catch (e) { t.select(); document.execCommand('copy'); avviso('Copiato!'); }
+    };
+    $('#tSalva').onclick = () => Piattaforma.salvaFile(nomeFile, $('#tTesto').value);
+    $('#tProg').onclick = () => creaProgettoDaTesto($('#tTesto').value, prm.nome);
   },
 });
 

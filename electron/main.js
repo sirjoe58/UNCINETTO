@@ -52,7 +52,8 @@ ipcMain.handle('scriviNAS', (e, nome, testo) => {
   scriviSicuro(path.join(c, path.basename(nome)), testo); return true;
 });
 ipcMain.handle('salvaFile', async (e, nome, testo) => {
-  const r = await dialog.showSaveDialog(win, { defaultPath: path.join(app.getPath('documents'), nome), filters: [{ name: 'Copia SirJoe Uncinetto', extensions: ['json'] }] });
+  const ext = path.extname(nome).slice(1) || 'txt';
+  const r = await dialog.showSaveDialog(win, { defaultPath: path.join(app.getPath('documents'), nome), filters: [{ name: ext === 'json' ? 'Copia SirJoe Uncinetto' : 'File di testo', extensions: [ext] }] });
   if (r.canceled || !r.filePath) return false;
   fs.writeFileSync(r.filePath, testo, 'utf8'); return true;
 });
