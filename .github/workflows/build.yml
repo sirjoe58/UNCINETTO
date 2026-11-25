@@ -105,6 +105,6 @@ jobs:
     steps:
       - name: Tieni solo le ultime 2 versioni
         run: |
-          gh release list --limit 100 --json tagName,createdAt --jq 'sort_by(.createdAt) | reverse | .[2:] | .[].tagName' | while read t; do
+          gh release list --limit 100 --json tagName,publishedAt --jq 'sort_by(.publishedAt) | reverse | .[2:] | .[].tagName' | while read t; do
             [ -n "$t" ] && { echo "Cancello $t"; gh release delete "$t" --yes --cleanup-tag || true; }
           done
