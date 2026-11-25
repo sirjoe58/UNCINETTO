@@ -9,6 +9,9 @@ link a siti di schemi gratuiti, sincronizzazione tramite NAS.
 Progettista di forme per amigurumi (sfera, ovale, cilindro, cono, goccia) e 10 modelli esclusivi
 (centrini, poncho, scaldamuscoli, borse, pupazzi, idee regalo).
 
+## Novità 1.3
+- **Uncinetto Hub**: raccolta di siti con schemi da scaricare, con preferiti, note, link personali (sincronizzati sul NAS), filtri ed esportazione JSON.
+
 ## Novità 1.2
 - **Da foto a schema**: carichi una foto e l'intelligenza artificiale Claude scrive lo schema giro per giro
   (serve una chiave API di Anthropic, da inserire in Impostazioni; resta solo sul dispositivo).

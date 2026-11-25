@@ -28,7 +28,7 @@ const Nav = {
     const { vista, param } = this.attuale();
     Piattaforma.schermoAcceso(vista === 'contatore' || vista === 'progetto' ? Archivio.imp.schermo : false);
     $('#btnIndietro').hidden = this.pila.length <= 1;
-    const radiceMenu = { home: 'home', contatore: 'contatore', schemi: 'schemi', categoria: 'schemi', schema: 'schemi', progetti: 'progetti', progetto: 'progetti', scuola: 'home', lezione: 'home', forme: 'home', foto: 'home' }[vista] || 'altro';
+    const radiceMenu = { home: 'home', contatore: 'contatore', schemi: 'schemi', categoria: 'schemi', schema: 'schemi', progetti: 'progetti', progetto: 'progetti', scuola: 'home', lezione: 'home', forme: 'home', foto: 'home', hub: 'home' }[vista] || 'altro';
     $$('#menu button').forEach(b => b.classList.toggle('attivo', b.dataset.vai === radiceMenu && this.pila.length >= 1));
     const v = $('#vista'); v.scrollTop = 0;
     (VISTE[vista] || VISTE.home)(v, param);
@@ -125,7 +125,7 @@ const VISTE = {
            ['contatore', '➕', 'Contatore', 'Conta giri e maglie'], ['schemi', '🧶', 'Schemi', `${SCHEMI.length} schemi in ${CATEGORIE.length} categorie`],
            ['progetti', '📁', 'I miei progetti', `${D().progetti.length} progetti`], ['mieiSchemi', '✏️', 'Disegna schemi', 'Griglia a colori e simboli'],
            ['libreria', '📖', 'Libreria punti', `${PUNTI.length} punti spiegati`], ['calcolatori', '🧮', 'Calcolatori', 'Campione, filato, aumenti'],
-           ['online', '🌐', 'Trova online', 'Schemi gratis da stampare e social'], ['impostazioni', '⚙️', 'Impostazioni', 'NAS, testo, modalità']]
+           ['hub', '🧺', 'Uncinetto Hub', 'Raccolta di siti con schemi da scaricare'], ['online', '🌐', 'Trova online', 'Schemi gratis da stampare e social'], ['impostazioni', '⚙️', 'Impostazioni', 'NAS, testo, modalità']]
           .map(([id, e, t, d]) => `<button class="tessera" data-vai="${id}"><span class="emoji">${e}</span><b>${t}</b><small>${d}</small></button>`).join('')}
       </div>`;
     if (inCorso) $('#riprendi').onclick = () => Nav.vai('progetto', inCorso.id);
@@ -269,7 +269,7 @@ const VISTE = {
 
   altro(v) {
     titolo('Altro');
-    v.innerHTML = `<div class="griglia">${[['foto', '📸', 'Da foto a schema'], ['importa', '📥', 'Importa schema scritto'], ['scuola', '🎓', 'Scuola di schemi'], ['forme', '🧸', 'Progettista di forme'], ['mieiSchemi', '✏️', 'Disegna schemi'], ['libreria', '📖', 'Libreria punti'], ['calcolatori', '🧮', 'Calcolatori'],
+    v.innerHTML = `<div class="griglia">${[['hub', '🧺', 'Uncinetto Hub'], ['foto', '📸', 'Da foto a schema'], ['importa', '📥', 'Importa schema scritto'], ['scuola', '🎓', 'Scuola di schemi'], ['forme', '🧸', 'Progettista di forme'], ['mieiSchemi', '✏️', 'Disegna schemi'], ['libreria', '📖', 'Libreria punti'], ['calcolatori', '🧮', 'Calcolatori'],
       ['online', '🌐', 'Trova online'], ['impostazioni', '⚙️', 'Impostazioni'], ['guida', '❓', 'Guida all\'app']]
       .map(([id, e, t]) => `<button class="tessera" data-vai="${id}"><span class="emoji">${e}</span><b>${t}</b></button>`).join('')}</div>`;
     $$('.tessera', v).forEach(t => t.onclick = () => Nav.vai(t.dataset.vai));
@@ -331,13 +331,14 @@ const VISTE = {
 
   online(v) {
     titolo('Trova online');
-    v.innerHTML = `<p class="tenue">Schemi gratuiti divisi per categoria: 🖨️ = PDF gratuito da scaricare e stampare. Tocca un nome e la pagina si apre nel browser; sotto ogni categoria trovi le ricerche già pronte su Pinterest, YouTube, Instagram, Facebook e TikTok. Gli schemi appartengono ai loro autori.</p>` +
+    v.innerHTML = `<div class="bottoni"><button class="btn" id="vaiHub">🧺 Apri Uncinetto Hub (preferiti, note e link personali)</button></div><p class="tenue">Schemi gratuiti divisi per categoria: 🖨️ = PDF gratuito da scaricare e stampare. Tocca un nome e la pagina si apre nel browser; sotto ogni categoria trovi le ricerche già pronte su Pinterest, YouTube, Instagram, Facebook e TikTok. Gli schemi appartengono ai loro autori.</p>` +
       `<div class="schede-tab">${LINK_ONLINE.map((g, i) => `<button data-salta="${i}">${g.emoji} ${g.cat.split(' (')[0]}</button>`).join('')}</div>` +
       LINK_ONLINE.map((g, i) => `<h3 id="cat${i}">${g.emoji} ${g.cat}</h3><div class="lista">${g.link.map(l => `
         <div class="riga" data-url="${esc(l.url)}"><span class="emoji">${l.pdf ? '🖨️' : '🔗'}</span><div class="cresci"><b>${esc(l.nome)}</b>${l.pdf ? '<span class="nuovo">PDF da stampare</span>' : ''}<small>${esc(l.nota)}</small></div><span>↗</span></div>`).join('')}</div>
         <div class="bottoni" style="margin-top:6px"><span class="piccolo tenue" style="align-self:center">Cerca sui social:</span>${SOCIAL.map((so, k) => `<button class="btn sec piccolo" data-so="${k}" data-q="${esc(g.social)}">${so.emoji} ${so.nome}</button>`).join('')}</div>`).join('') +
       `<div class="consiglio">💡 Negli schemi in inglese: <b>sc</b> = maglia bassa, <b>hdc</b> = mezza maglia alta, <b>dc</b> = maglia alta, <b>tr</b> = maglia altissima, <b>ch</b> = catenella, <b>sl st</b> = maglia bassissima. Attenzione: negli schemi inglesi (UK) "dc" significa maglia bassa! Controlla sempre se lo schema è US o UK.</div>`;
     $$('[data-url]', v).forEach(r => r.onclick = () => Piattaforma.apriLink(r.dataset.url));
+    $('#vaiHub').onclick = () => Nav.vai('hub');
     $$('[data-so]', v).forEach(b => b.onclick = () => Piattaforma.apriLink(SOCIAL[+b.dataset.so].url(b.dataset.q)));
     $$('[data-salta]', v).forEach(b => b.onclick = () => { const t = $('#cat' + b.dataset.salta); t && t.scrollIntoView({ behavior: 'smooth' }); });
   },
@@ -362,7 +363,7 @@ const VISTE = {
         <p class="tenue piccolo">Salva un file con tutti i progetti e gli schemi, oppure recuperali da un file.</p>
         <div class="bottoni"><button class="btn sec" id="esporta">💾 Esporta copia</button><button class="btn sec" id="importaB">📂 Importa copia</button>
         <input type="file" id="importa" accept=".json,application/json" hidden></div></div>
-      <p class="tenue piccolo">SirJoe Uncinetto 1.2 · ${PIATTAFORMA}</p>`;
+      <p class="tenue piccolo">SirJoe Uncinetto 1.3 · ${PIATTAFORMA}</p>`;
     $('#iChiave').value = imp.chiaveIA || ''; $('#iModello').value = imp.modelloIA || MODELLI_IA[0].id;
     $('#iChiave').onchange = e => { imp.chiaveIA = e.target.value.trim(); Archivio.salvaImp(); avviso('Chiave salvata su questo dispositivo'); };
     $('#iModello').onchange = e => { imp.modelloIA = e.target.value; Archivio.salvaImp(); };
@@ -712,6 +713,119 @@ Object.assign(VISTE, {
     };
     $('#tSalva').onclick = () => Piattaforma.salvaFile(nomeFile, $('#tTesto').value);
     $('#tProg').onclick = () => creaProgettoDaTesto($('#tTesto').value, prm.nome);
+  },
+});
+
+
+/* ---------------- Uncinetto Hub ---------------- */
+function hubDati() {
+  if (!D().hub) D().hub = { agg: 0, personali: [], preferiti: [], note: {} };
+  return D().hub;
+}
+function hubSalva() { hubDati().agg = ora(); Archivio.salva(); }
+
+Object.assign(VISTE, {
+  hub(v) {
+    titolo('Uncinetto Hub');
+    const H = hubDati();
+    const st = VISTE.hub.f || (VISTE.hub.f = { cat: 'Tutte', q: '', liv: 'Tutti', lin: 'Tutte', libero: false, pref: false, nuovo: false });
+    const tutte = () => [...H.personali, ...HUB_RISORSE];
+    const filtra = () => tutte().filter(r => {
+      if (st.pref && !H.preferiti.includes(r.id)) return false;
+      if (st.cat === 'Solo i miei link' ? !r.personale : st.cat !== 'Tutte' && r.categoria !== st.cat) return false;
+      if (st.liv !== 'Tutti' && r.livello !== st.liv && r.livello !== 'Tutti') return false;
+      if (st.lin !== 'Tutte' && r.lingua !== st.lin) return false;
+      if (st.libero && r.registrazione) return false;
+      const t = st.q.trim().toLowerCase();
+      return !t || r.titolo.toLowerCase().includes(t) || r.categoria.toLowerCase().includes(t);
+    });
+    const scelta = (nome, opz, val) => `<div class="pillole" data-campo="${nome}">${opz.map(o => `<button type="button" data-v="${esc(o)}" class="${o === val ? 'attivo' : ''}">${esc(o)}</button>`).join('')}</div>`;
+    const modulo = () => `<form class="scheda" id="hubForm">
+      <h3 style="margin-top:0">➕ Aggiungi nuovo link</h3>
+      <label>Titolo dello schema/portale *</label><input id="hT" placeholder="Borsa Granny Square Estate">
+      <label>URL / Link diretto *</label><input id="hU" type="url" value="https://">
+      <label>Categoria</label><select id="hC">${[...HUB_CATEGORIE, 'Altro'].map(c => `<option>${c}</option>`).join('')}</select>
+      <label>Formato</label>${scelta('formato', HUB_FORMATI, 'PDF / Diagrammi')}
+      <label>Livello</label>${scelta('livello', HUB_LIVELLI, 'Tutti')}
+      <label>Lingua</label>${scelta('lingua', HUB_LINGUE, 'IT')}
+      <label><input type="checkbox" id="hR" style="width:auto"> Registrazione richiesta</label>
+      <p id="hErr" class="consiglio" hidden></p>
+      <div class="bottoni"><button class="btn verde" type="submit">💾 Salva link</button><button class="btn sec" type="button" id="hAnnulla">Annulla</button></div></form>`;
+    const card = r => {
+      const pref = H.preferiti.includes(r.id), nota = H.note[r.id] || '';
+      return `<div class="hub-card" data-id="${esc(r.id)}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start"><span class="hub-cat">${esc(r.categoria)}</span>
+          <button class="cuore ${pref ? 'on' : ''}" data-a="pref" aria-label="Preferito">${pref ? '♥' : '♡'}</button></div>
+        <h4>${esc(r.titolo)}</h4>
+        <div><span class="etichetta">${esc(r.formato)}</span><span class="livello ${r.livello === 'Intermedio' ? 'l2' : r.livello === 'Esperto' ? 'l3' : ''}">${r.livello === 'Tutti' ? 'Tutti i livelli' : esc(r.livello)}</span>
+          <span class="etichetta">${esc(r.lingua)}</span>${r.personale ? '<span class="etichetta badge-p">Personale</span>' : ''}</div>
+        <div class="piccolo" style="font-weight:600;color:${r.registrazione ? 'var(--primario-scuro)' : 'var(--secondario)'}">${r.registrazione ? '🔒 Registrazione gratuita' : '🔓 Accesso libero'}</div>
+        <textarea data-a="nota" placeholder="📝 Aggiungi nota (es. usare uncinetto n. 4)" style="min-height:44px;font-size:.9em">${esc(nota)}</textarea>
+        <div class="bottoni" style="margin:4px 0 0"><button class="btn" data-a="apri" style="flex:1">Apri e Scarica Schema ↗</button>
+          ${r.personale ? '<button class="btn sec" data-a="elimina" title="Elimina">🗑</button>' : ''}</div></div>`;
+    };
+    const disegnaLista = () => {
+      const lista = filtra();
+      $('#hubConta').textContent = `${lista.length} ${lista.length === 1 ? 'risorsa disponibile' : 'risorse disponibili'}`;
+      $('#hubPrefN').textContent = H.preferiti.length;
+      $('#hubLista').innerHTML = lista.length ? `<div class="hub-griglia">${lista.map(card).join('')}</div>`
+        : `<div class="scheda" style="text-align:center"><h3>🧶 Nessuno schema trovato</h3><p class="tenue">${st.pref && !H.preferiti.length ? 'Non hai ancora preferiti: tocca il cuore su una scheda.' : 'Nessuna risorsa corrisponde ai filtri scelti.'}</p>
+           <button class="btn" id="hubReset">Reimposta tutti i filtri</button></div>`;
+      const rs = $('#hubReset'); if (rs) rs.onclick = () => { Object.assign(st, { cat: 'Tutte', q: '', liv: 'Tutti', lin: 'Tutte', libero: false, pref: false }); disegna(); };
+      $$('.hub-card', v).forEach(el => {
+        const id = el.dataset.id; const r = tutte().find(x => String(x.id) === id); if (!r) return;
+        el.querySelector('[data-a="apri"]').onclick = () => Piattaforma.apriLink(r.url);
+        el.querySelector('[data-a="pref"]').onclick = () => { H.preferiti = H.preferiti.includes(r.id) ? H.preferiti.filter(x => x !== r.id) : [...H.preferiti, r.id]; hubSalva(); disegnaLista(); };
+        el.querySelector('[data-a="nota"]').onchange = e => { const t = e.target.value.trim(); if (t) H.note[r.id] = t; else delete H.note[r.id]; hubSalva(); };
+        const del = el.querySelector('[data-a="elimina"]');
+        if (del) del.onclick = () => { if (!confirm(`Eliminare "${r.titolo}"?`)) return; H.personali = H.personali.filter(x => x.id !== r.id); H.preferiti = H.preferiti.filter(x => x !== r.id); delete H.note[r.id]; hubSalva(); disegnaLista(); };
+      });
+    };
+    const disegna = () => {
+      v.innerHTML = `<div class="scheda" style="background:#f4eee5">
+          <h2 style="margin:0">🧺 Uncinetto Hub</h2><p class="tenue" style="margin:4px 0">La tua raccolta selezionata di schemi gratuiti da scaricare e stampare</p>
+          <b id="hubConta" style="color:var(--secondario)"></b>
+          <div class="bottoni"><button class="btn" id="hubNuovo">➕ Aggiungi Nuovo Link</button>
+            <button class="btn ${st.pref ? '' : 'sec'}" id="hubPref">♥ I miei Preferiti (<span id="hubPrefN"></span>)</button>
+            <button class="btn sec" id="hubEsporta">💾 Esporta JSON</button><button class="btn sec" id="hubConti">⏱ Contagiri</button></div></div>
+        ${st.nuovo ? modulo() : ''}
+        <input id="hubQ" placeholder="🔍 Cerca per titolo o categoria…" value="${esc(st.q)}">
+        <div class="pillole" style="margin-top:10px" id="hubCat">${['Tutte', ...HUB_CATEGORIE, 'Solo i miei link'].map(c => `<button data-c="${c}" class="${st.cat === c ? 'attivo' : ''}">${c}</button>`).join('')}</div>
+        <div class="bottoni">
+          <select id="hubLiv" style="width:auto">${HUB_LIVELLI.map(l => `<option value="${l}">${l === 'Tutti' ? 'Tutti i livelli' : l}</option>`).join('')}</select>
+          <select id="hubLin" style="width:auto">${['Tutte', ...HUB_LINGUE].map(l => `<option value="${l}">${l === 'Tutte' ? 'Tutte le lingue' : l}</option>`).join('')}</select>
+          <label style="margin:0;display:flex;align-items:center;gap:6px;font-weight:600"><input type="checkbox" id="hubLib" style="width:auto" ${st.libero ? 'checked' : ''}> Solo senza registrazione</label></div>
+        <div id="hubLista"></div>
+        <p class="tenue piccolo" style="text-align:center;margin-top:16px">Gli schemi appartengono ai rispettivi autori. Preferiti, note e link personali si sincronizzano con il NAS.</p>`;
+      $('#hubLiv').value = st.liv; $('#hubLin').value = st.lin;
+      $('#hubQ').oninput = e => { st.q = e.target.value; disegnaLista(); };
+      $$('#hubCat button', v).forEach(b => b.onclick = () => { st.cat = b.dataset.c; $$('#hubCat button', v).forEach(x => x.classList.toggle('attivo', x === b)); disegnaLista(); });
+      $('#hubLiv').onchange = e => { st.liv = e.target.value; disegnaLista(); };
+      $('#hubLin').onchange = e => { st.lin = e.target.value; disegnaLista(); };
+      $('#hubLib').onchange = e => { st.libero = e.target.checked; disegnaLista(); };
+      $('#hubPref').onclick = () => { st.pref = !st.pref; disegna(); };
+      $('#hubNuovo').onclick = () => { st.nuovo = !st.nuovo; disegna(); if (st.nuovo) $('#hT').focus(); };
+      $('#hubConti').onclick = () => Nav.vai('contatore');
+      $('#hubEsporta').onclick = () => Piattaforma.salvaFile('schemi_uncinetto_links.json', JSON.stringify({ risorse: tutte() }, null, 2));
+      const f = $('#hubForm');
+      if (f) {
+        const sc = { formato: 'PDF / Diagrammi', livello: 'Tutti', lingua: 'IT' };
+        $$('[data-campo]', f).forEach(g => $$('button', g).forEach(b => b.onclick = () => { sc[g.dataset.campo] = b.dataset.v; $$('button', g).forEach(x => x.classList.toggle('attivo', x === b)); }));
+        $('#hAnnulla').onclick = () => { st.nuovo = false; disegna(); };
+        f.onsubmit = e => {
+          e.preventDefault();
+          const err = t => { const p = $('#hErr'); p.textContent = t; p.hidden = false; };
+          const titoloL = $('#hT').value.trim(), url = $('#hU').value.trim();
+          if (!titoloL) return err('Scrivi il titolo dello schema.');
+          let ok = false; try { const u = new URL(url); ok = u.protocol === 'https:' && u.hostname.includes('.'); } catch (x) {}
+          if (!ok) return err('Il link deve iniziare con https:// ed essere un indirizzo valido.');
+          H.personali.unshift({ id: 'p' + Date.now(), titolo: titoloL, url, categoria: $('#hC').value, ...sc, registrazione: $('#hR').checked, personale: true });
+          hubSalva(); Object.assign(st, { nuovo: false, cat: 'Tutte', pref: false }); disegna(); avviso('Link aggiunto');
+        };
+      }
+      disegnaLista();
+    };
+    disegna();
   },
 });
 
